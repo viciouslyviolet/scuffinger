@@ -1,0 +1,141 @@
+package i18n
+
+// ── Svenska (Swedish) ────────────────────────────────────────────────────────
+
+var Sv = Messages{
+	// Config
+	MsgConfigLoaded: "Konfiguration laddad",
+	ErrConfigLoad:   "Kunde inte ladda konfiguration",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "Ansluter till bakgrundstjänster",
+	MsgBootstrapSelfTests:   "Kör uppstartstester",
+	MsgBootstrapTestsPassed: "Alla uppstartstester godkända",
+	MsgBootstrapHealthStart: "Periodiska hälsokontroller startade",
+	ErrBootstrapConnect:     "Kunde inte ansluta till nödvändiga tjänster",
+	ErrBootstrapSelfTests:   "Uppstartstester misslyckades",
+
+	// Manager
+	MsgManagerConnecting:     "Ansluter till tjänst",
+	MsgManagerConnected:      "Ansluten till tjänst",
+	MsgManagerSelfTest:       "Kör självtest",
+	MsgManagerSelfTestPassed: "Självtest godkänt",
+	MsgManagerClosing:        "Stänger tjänster",
+	WarnManagerHealthFailed:  "Hälsokontroll misslyckades",
+	ErrManagerConnect:        "Kunde inte ansluta till tjänst",
+	ErrManagerSelfTest:       "Självtest misslyckades för tjänst",
+	ErrManagerClose:          "Fel vid stängning av tjänst",
+	ErrManagerShutdown:       "Fel uppstod under avstängning",
+
+	// Cache
+	MsgCacheSelfTestInit:   "Sätter init-nyckel med aktuell tidsstämpel",
+	MsgCacheSelfTestPassed: "Cache-självtest godkänt",
+	ErrCachePing:           "Cache är inte nåbar",
+	ErrCacheSetInit:        "Kunde inte skriva init-nyckel till cache",
+	ErrCacheGetInit:        "Kunde inte läsa init-nyckel från cache",
+	ErrCacheInitMismatch:   "Cache init-värde stämmer inte överens",
+
+	// Database
+	MsgDbCreatingTestDb:  "Skapar tillfällig testdatabas",
+	MsgDbRunningCrud:     "Kör CRUD-verifiering",
+	MsgDbSelfTestPassed:  "Databas-självtest godkänt",
+	WarnDbDropTestFailed: "Kunde inte ta bort testdatabas (försöker igen vid nästa start)",
+	ErrDbConnect:         "Databasen är inte nåbar",
+	ErrDbPing:            "Databasen svarade inte på ping",
+	ErrDbCreateTestDb:    "Kunde inte skapa testdatabas",
+	ErrDbConnectTestDb:   "Kunde inte ansluta till testdatabas",
+	ErrDbCrud:            "CRUD-verifiering av databas misslyckades",
+	ErrDbCreateTable:     "Kunde inte skapa testtabell",
+	ErrDbInsert:          "Kunde inte infoga testpost",
+	ErrDbRead:            "Kunde inte läsa testpost",
+	ErrDbReadMismatch:    "Testpostens värde stämmer inte med förväntat",
+	ErrDbUpdate:          "Kunde inte uppdatera testpost",
+	ErrDbReadAfterUpdate: "Kunde inte läsa testpost efter uppdatering",
+	ErrDbUpdateMismatch:  "Uppdaterat testpostvärde stämmer inte med förväntat",
+
+	// Server
+	MsgServerStarting: "HTTP-server startar",
+	MsgServerShutdown: "Stänger HTTP-server",
+	MsgServerStopped:  "HTTP-server stoppades korrekt",
+	MsgServerRoutes:   "Rutter registrerade",
+	ErrServerListen:   "HTTP-server stötte på ett fel",
+	ErrServerShutdown: "HTTP-server tvingades att stänga",
+
+	// Health
+	MsgHealthReady:    "Alla tjänster är friska",
+	MsgHealthNotReady: "En eller flera tjänster är inte redo",
+
+	// GitHub
+	MsgGhConnecting:      "Ansluter till GitHub API",
+	MsgGhConnected:       "Ansluten till GitHub API",
+	MsgGhAuthToken:       "Autentiserar med personlig åtkomsttoken",
+	MsgGhAuthApp:         "Autentiserar som GitHub-app",
+	MsgGhSelfTestPassed:  "GitHub-självtest godkänt",
+	MsgGhRateRemaining:   "Status för GitHub API-hastighetsbegränsning",
+	WarnGhRateLow:        "GitHub API-hastighetsbegränsningen börjar ta slut",
+	ErrGhNotConfigured:   "GitHub är inte konfigurerat — ange en token eller appuppgifter",
+	ErrGhAuth:            "GitHub-autentisering misslyckades",
+	ErrGhReadKey:         "Kunde inte läsa GitHub-appens privata nyckelfil",
+	ErrGhParseKey:        "Kunde inte tolka GitHub-appens privata nyckel",
+	ErrGhInstallToken:    "Kunde inte hämta GitHub-appens installationstoken",
+	ErrGhSelfTest:        "GitHub-självtest misslyckades",
+	ErrGhRateLimit:       "GitHub API-hastighetsbegränsning för låg",
+	ErrGhFetchUser:       "Kunde inte hämta GitHub-användare",
+	ErrGhFetchOrg:        "Kunde inte hämta GitHub-organisation",
+	ErrGhFetchRepo:       "Kunde inte hämta GitHub-förråd",
+	ErrGhFetchBranches:   "Kunde inte hämta förrådsgrenar",
+	ErrGhFetchWorkflows:  "Kunde inte hämta förrådsarbetsflöden",
+	ErrGhFetchRuns:       "Kunde inte hämta arbetsflödeskörningar",
+	ErrGhFetchRateLimit:  "Kunde inte hämta GitHub-hastighetsbegränsning",
+	ErrGhInvalidWorkflow: "Ogiltigt arbetsflödes-ID",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "GitHub-förrådssamlare startar",
+	MsgGhCollectorTick:             "Kör GitHub-insamlingscykel",
+	MsgGhCollectorRepo:             "Samlar in data för förråd",
+	MsgGhCollectorStopped:          "GitHub-förrådssamlare stoppad",
+	MsgGhCollectorPassed:           "GitHub-samlare självtest godkänt",
+	MsgGhCollectorAnnotations:      "Annotationer insamlade för misslyckat jobb",
+	MsgGhCollectorLockAcquired:     "Insamlingslås anskaffat för förråd",
+	MsgGhCollectorLockSkipped:      "Förråd överhoppat (en annan instans håller låset)",
+	WarnGhCollectorLockError:       "Kunde inte anskaffa distribuerat lås (fortsätter ändå)",
+	ErrGhCollectorFetchRepo:        "Kunde inte hämta förrådsmetadata",
+	ErrGhCollectorFetchRuns:        "Kunde inte hämta arbetsflödeskörningar",
+	ErrGhCollectorFetchJobs:        "Kunde inte hämta arbetsflödesjobb",
+	ErrGhCollectorFetchAnnotations: "Kunde inte hämta check-run-annotationer",
+	ErrGhCollectorNoRepos:          "Inga förråd konfigurerade för övervakning",
+	ErrGhCollectorParseRepo:        "Ogiltigt förrådsformat (förväntat: ägare/förråd)",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "Ange koden på URL:en för att autentisera",
+	MsgAuthPolling:        "Väntar på GitHub-auktorisering…",
+	MsgAuthSuccess:        "Framgångsrikt autentiserad med GitHub",
+	MsgAuthLoggedOut:      "GitHub-uppgifter borttagna",
+	MsgAuthStatusLoggedIn: "Inloggad på GitHub",
+	MsgAuthStatusNoToken:  "Inte inloggad — kör 'scuffinger github auth' för att autentisera",
+	MsgAuthTokenFromVault: "Använder GitHub-token från systemvalvet",
+	ErrAuthNoClientID:     "github.client_id måste anges i konfigurationen för OAuth-inloggning",
+	ErrAuthDeviceCode:     "Kunde inte starta GitHub-enhetsflöde",
+	ErrAuthPoll:           "Kunde inte slutföra GitHub-auktorisering",
+	ErrAuthSaveToken:      "Kunde inte spara token i systemvalvet",
+	ErrAuthVerifyToken:    "Lagrad token är inte längre giltig",
+
+	// CLI commands
+	CmdRootShort:         "Scuffinger — en lättviktig GitHub-övervakningstjänst",
+	CmdRootLong:          "Scuffinger är en lättviktig tjänst för övervakning av GitHub-förråd, arbetsflöden och mätvärden. Byggd med Cobra, Viper och Gin.",
+	CmdVersionShort:      "Visa versionsnummer",
+	CmdVersionLong:       "Visar aktuell version av scuffinger-applikationen, inklusive bygginformation om tillgänglig.",
+	CmdServeShort:        "Starta HTTP-servern",
+	CmdServeLong:         "Startar Gin HTTP-servern med hälsokontroller, Prometheus-mätvärden och GitHub API-slutpunkter. Servern ansluter till alla konfigurerade bakgrundstjänster vid start.",
+	CmdGitHubShort:       "GitHub-autentisering och status",
+	CmdGitHubLong:        "Hantera GitHub OAuth-autentisering. Använd underkommandon för att logga in via enhetsflöde, kontrollera autentiseringsstatus eller ta bort lagrade uppgifter.",
+	CmdGitHubAuthShort:   "Autentisera med GitHub via OAuth",
+	CmdGitHubAuthLong:    "Startar GitHub OAuth-enhetsflödet. Du får en engångskod att ange på github.com/login/device. Efter auktorisering lagras token säkert i systemvalvet.",
+	CmdGitHubStatusShort: "Visa aktuell autentiseringsstatus",
+	CmdGitHubStatusLong:  "Visar aktuell GitHub-autentiseringsstatus, inklusive om uppgifter lagras i konfigurationsfilen, miljövariabler eller systemvalvet.",
+	CmdGitHubLogoutShort: "Ta bort lagrade GitHub-uppgifter",
+	CmdGitHubLogoutLong:  "Tar bort alla GitHub OAuth-tokens som lagras i systemvalvet. Påverkar inte tokens konfigurerade via konfigurationsfil eller miljövariabler.",
+	CmdGitHubMonitorShort: "Starta GitHub-förrådsinsamlaren",
+	CmdGitHubMonitorLong:  "Startar bakgrunds-GitHub-insamlaren som regelbundet hämtar förrådsmetadata, arbetsflödeskörningar och jobbstegstider. Exponerar hälso- och Prometheus-mätvärdeslutpunkter men inga API-proxyvägar. Designad för att köras som en separat process bredvid API-servern.",
+	CmdFlagConfig:        "Sökväg till konfigurationsfil",
+}

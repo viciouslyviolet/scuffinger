@@ -1,0 +1,46 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "charts/**"
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  CHART_PATH: charts/scuffinger
+
+jobs:
+  publish:
+    name: Package & Push Helm Chart
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR OCI
+        uses: docker://alpine/helm:3.17.3
+        env:
+          HELM_EXPERIMENTAL_OCI: "1"
+        with:
+          entrypoint: helm
+          args: registry login ${{ env.REGISTRY }} --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package chart
+        uses: docker://alpine/helm:3.17.3
+        with:
+          entrypoint: helm
+          args: package ${{ env.CHART_PATH }} --destination /tmp/charts
+
+      - name: Push chart to GHCR
+        uses: docker://alpine/helm:3.17.3
+        env:
+          HELM_EXPERIMENTAL_OCI: "1"
+        with:
+          entrypoint: sh
+          args: >-
+            -c "helm push /tmp/charts/scuffinger-*.tgz oci://${{ env.REGISTRY }}/${{ github.repository_owner }}/charts"
+

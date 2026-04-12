@@ -1,0 +1,279 @@
+{{- if .Values.grafana.enabled }}
+{{- if not .Values.grafana.admin.existingSecret }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-grafana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "grafana") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+type: Opaque
+data:
+  admin-user: {{ .Values.grafana.admin.user | b64enc | quote }}
+  admin-password: {{ .Values.grafana.admin.password | b64enc | quote }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-grafana-datasources
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "grafana") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+data:
+  datasources.yml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus
+        access: proxy
+        url: http://{{ include "scuffinger.prometheus.host" . }}:{{ .Values.prometheus.service.port }}
+        isDefault: true
+        editable: false
+      {{- if .Values.loki.enabled }}
+      - name: Loki
+        type: loki
+        uid: loki
+        access: proxy
+        url: http://{{ include "scuffinger.loki.host" . }}:{{ .Values.loki.service.port }}
+        editable: false
+        jsonData:
+          maxLines: 1000
+      {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-grafana-dashboards-provider
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "grafana") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+data:
+  dashboards.yml: |
+    apiVersion: 1
+    providers:
+      - name: Scuffinger
+        orgId: 1
+        folder: Scuffinger
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /etc/grafana/provisioning/dashboards/json
+          foldersFromFilesStructure: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-grafana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "grafana") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+spec:
+  type: {{ .Values.grafana.service.type }}
+  ports:
+    - port: {{ .Values.grafana.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "scuffinger.componentSelectorLabels" (list . "grafana") | nindent 4 }}
+{{- if .Values.grafana.ingress.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-grafana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "grafana") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+    {{- with .Values.grafana.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.grafana.ingress.className }}
+  ingressClassName: {{ .Values.grafana.ingress.className }}
+  {{- end }}
+  {{- if .Values.grafana.ingress.tls }}
+  tls:
+    {{- range .Values.grafana.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.grafana.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "scuffinger.fullname" $ }}-grafana
+                port:
+                  name: http
+          {{- end }}
+    {{- end }}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-grafana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "grafana") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "scuffinger.componentSelectorLabels" (list . "grafana") | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/datasources: {{ toYaml .Values.grafana | sha256sum }}
+        {{- with .Values.grafana.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "scuffinger.componentSelectorLabels" (list . "grafana") | nindent 8 }}
+        {{- with .Values.grafana.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      securityContext:
+        runAsUser: 472
+        runAsGroup: 472
+        fsGroup: 472
+      {{- with .Values.grafana.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.grafana.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.grafana.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: grafana
+          image: {{ printf "%s:%s" .Values.grafana.image.repository .Values.grafana.image.tag }}
+          imagePullPolicy: {{ .Values.grafana.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.grafana.admin.existingSecret | default (printf "%s-grafana" (include "scuffinger.fullname" .)) }}
+                  key: admin-user
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.grafana.admin.existingSecret | default (printf "%s-grafana" (include "scuffinger.fullname" .)) }}
+                  key: admin-password
+            - name: GF_USERS_ALLOW_SIGN_UP
+              value: {{ .Values.grafana.allowSignUp | quote }}
+            {{- if .Values.grafana.dashboards.enabled }}
+            - name: GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH
+              value: /etc/grafana/provisioning/dashboards/json/scuffinger-overview.json
+            {{- end }}
+            {{- with .Values.grafana.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.grafana.resources | nindent 12 }}
+          volumeMounts:
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
+              readOnly: true
+            - name: dashboards-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+              subPath: dashboards.yml
+              readOnly: true
+            {{- if .Values.grafana.dashboards.enabled }}
+            - name: dashboards-json
+              mountPath: /etc/grafana/provisioning/dashboards/json
+              readOnly: true
+            {{- end }}
+            - name: data
+              mountPath: /var/lib/grafana
+      volumes:
+        - name: datasources
+          configMap:
+            name: {{ include "scuffinger.fullname" . }}-grafana-datasources
+        - name: dashboards-provider
+          configMap:
+            name: {{ include "scuffinger.fullname" . }}-grafana-dashboards-provider
+        {{- if .Values.grafana.dashboards.enabled }}
+        - name: dashboards-json
+          configMap:
+            name: {{ include "scuffinger.fullname" . }}-grafana-dashboards
+        {{- end }}
+        - name: data
+          {{- if .Values.grafana.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.grafana.persistence.existingClaim | default (printf "%s-grafana" (include "scuffinger.fullname" .)) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- if and .Values.grafana.persistence.enabled (not .Values.grafana.persistence.existingClaim) }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-grafana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "grafana") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+    {{- with .Values.grafana.persistence.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  accessModes:
+    {{- toYaml .Values.grafana.persistence.accessModes | nindent 4 }}
+  {{- if .Values.grafana.persistence.storageClass }}
+  storageClassName: {{ .Values.grafana.persistence.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.grafana.persistence.size }}
+{{- end }}
+{{- end }}
+

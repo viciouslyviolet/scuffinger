@@ -1,0 +1,21 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-postgresql
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "postgresql") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+spec:
+  type: {{ .Values.postgresql.service.type }}
+  ports:
+    - port: {{ .Values.postgresql.service.port }}
+      targetPort: postgresql
+      protocol: TCP
+      name: postgresql
+  selector:
+    {{- include "scuffinger.componentSelectorLabels" (list . "postgresql") | nindent 4 }}
+{{- end }}
+

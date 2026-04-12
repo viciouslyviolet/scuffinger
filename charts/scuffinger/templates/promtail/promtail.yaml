@@ -1,0 +1,149 @@
+{{- if .Values.promtail.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-promtail
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "promtail") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+data:
+  promtail.yml: |
+    server:
+      http_listen_port: 9080
+      grpc_listen_port: 0
+    positions:
+      filename: /tmp/positions.yaml
+    clients:
+      - url: http://{{ include "scuffinger.loki.host" . }}:{{ .Values.loki.service.port }}/loki/api/v1/push
+    scrape_configs:
+      - job_name: kubernetes-pods
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+            regex: {{ .Release.Name }}
+            action: keep
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_component]
+            target_label: component
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+        pipeline_stages:
+          - json:
+              expressions:
+                level: level
+                msg: msg
+          - labels:
+              level:
+      {{- with .Values.promtail.extraScrapeConfigs }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-promtail
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "promtail") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-promtail
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "promtail") | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["nodes", "nodes/proxy", "services", "endpoints", "pods"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-promtail
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "promtail") | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "scuffinger.fullname" . }}-promtail
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "scuffinger.fullname" . }}-promtail
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-promtail
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "promtail") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "scuffinger.componentSelectorLabels" (list . "promtail") | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ toYaml .Values.promtail | sha256sum }}
+        {{- with .Values.promtail.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "scuffinger.componentSelectorLabels" (list . "promtail") | nindent 8 }}
+        {{- with .Values.promtail.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "scuffinger.fullname" . }}-promtail
+      {{- with .Values.promtail.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.promtail.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: promtail
+          image: {{ printf "%s:%s" .Values.promtail.image.repository .Values.promtail.image.tag }}
+          imagePullPolicy: {{ .Values.promtail.image.pullPolicy }}
+          args:
+            - -config.file=/etc/promtail/promtail.yml
+          resources:
+            {{- toYaml .Values.promtail.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/promtail
+              readOnly: true
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - name: containers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: positions
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "scuffinger.fullname" . }}-promtail
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: containers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: positions
+          emptyDir: {}
+{{- end }}
+

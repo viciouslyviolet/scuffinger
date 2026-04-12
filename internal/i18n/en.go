@@ -1,0 +1,141 @@
+package i18n
+
+// ── English (default) ────────────────────────────────────────────────────────
+
+var En = Messages{
+	// Config
+	MsgConfigLoaded: "Configuration loaded",
+	ErrConfigLoad:   "Failed to load configuration",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "Connecting to backing services",
+	MsgBootstrapSelfTests:   "Running startup self-tests",
+	MsgBootstrapTestsPassed: "All self-tests passed",
+	MsgBootstrapHealthStart: "Periodic health checks started",
+	ErrBootstrapConnect:     "Unable to connect to required services",
+	ErrBootstrapSelfTests:   "Startup self-tests failed",
+
+	// Manager
+	MsgManagerConnecting:     "Connecting to service",
+	MsgManagerConnected:      "Connected to service",
+	MsgManagerSelfTest:       "Running self-test",
+	MsgManagerSelfTestPassed: "Self-test passed",
+	MsgManagerClosing:        "Shutting down services",
+	WarnManagerHealthFailed:  "Health check failed",
+	ErrManagerConnect:        "Failed to connect to service",
+	ErrManagerSelfTest:       "Self-test failed for service",
+	ErrManagerClose:          "Error closing service",
+	ErrManagerShutdown:       "Errors occurred during shutdown",
+
+	// Cache
+	MsgCacheSelfTestInit:   "Setting init key with current timestamp",
+	MsgCacheSelfTestPassed: "Cache self-test passed",
+	ErrCachePing:           "Cache is not reachable",
+	ErrCacheSetInit:        "Failed to write init key to cache",
+	ErrCacheGetInit:        "Failed to read init key from cache",
+	ErrCacheInitMismatch:   "Cache init value mismatch",
+
+	// Database
+	MsgDbCreatingTestDb:  "Creating temporary test database",
+	MsgDbRunningCrud:     "Running CRUD verification",
+	MsgDbSelfTestPassed:  "Database self-test passed",
+	WarnDbDropTestFailed: "Could not drop test database (will retry on next start)",
+	ErrDbConnect:         "Database is not reachable",
+	ErrDbPing:            "Database did not respond to ping",
+	ErrDbCreateTestDb:    "Failed to create test database",
+	ErrDbConnectTestDb:   "Failed to connect to test database",
+	ErrDbCrud:            "Database CRUD verification failed",
+	ErrDbCreateTable:     "Failed to create test table",
+	ErrDbInsert:          "Failed to insert test record",
+	ErrDbRead:            "Failed to read test record",
+	ErrDbReadMismatch:    "Test record value does not match expected",
+	ErrDbUpdate:          "Failed to update test record",
+	ErrDbReadAfterUpdate: "Failed to read test record after update",
+	ErrDbUpdateMismatch:  "Updated test record value does not match expected",
+
+	// Server
+	MsgServerStarting: "HTTP server starting",
+	MsgServerShutdown: "Shutting down HTTP server",
+	MsgServerStopped:  "HTTP server stopped gracefully",
+	MsgServerRoutes:   "Routes registered",
+	ErrServerListen:   "HTTP server encountered an error",
+	ErrServerShutdown: "HTTP server was forced to shut down",
+
+	// Health
+	MsgHealthReady:    "All services healthy",
+	MsgHealthNotReady: "One or more services are not ready",
+
+	// GitHub
+	MsgGhConnecting:      "Connecting to GitHub API",
+	MsgGhConnected:       "Connected to GitHub API",
+	MsgGhAuthToken:       "Authenticating with personal access token",
+	MsgGhAuthApp:         "Authenticating as GitHub App",
+	MsgGhSelfTestPassed:  "GitHub self-test passed",
+	MsgGhRateRemaining:   "GitHub API rate limit status",
+	WarnGhRateLow:        "GitHub API rate limit is running low",
+	ErrGhNotConfigured:   "GitHub is not configured — set a token or app credentials",
+	ErrGhAuth:            "GitHub authentication failed",
+	ErrGhReadKey:         "Failed to read GitHub App private key file",
+	ErrGhParseKey:        "Failed to parse GitHub App private key",
+	ErrGhInstallToken:    "Failed to obtain GitHub App installation token",
+	ErrGhSelfTest:        "GitHub self-test failed",
+	ErrGhRateLimit:       "GitHub API rate limit too low",
+	ErrGhFetchUser:       "Failed to fetch GitHub user",
+	ErrGhFetchOrg:        "Failed to fetch GitHub organization",
+	ErrGhFetchRepo:       "Failed to fetch GitHub repository",
+	ErrGhFetchBranches:   "Failed to fetch repository branches",
+	ErrGhFetchWorkflows:  "Failed to fetch repository workflows",
+	ErrGhFetchRuns:       "Failed to fetch workflow runs",
+	ErrGhFetchRateLimit:  "Failed to fetch GitHub rate limit",
+	ErrGhInvalidWorkflow: "Invalid workflow ID",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "GitHub repository collector starting",
+	MsgGhCollectorTick:             "Running GitHub collection cycle",
+	MsgGhCollectorRepo:             "Collecting data for repository",
+	MsgGhCollectorStopped:          "GitHub repository collector stopped",
+	MsgGhCollectorPassed:           "GitHub collector self-test passed",
+	MsgGhCollectorAnnotations:      "Collected annotations for failed job",
+	MsgGhCollectorLockAcquired:     "Acquired collection lock for repository",
+	MsgGhCollectorLockSkipped:      "Skipped repository (another instance holds the lock)",
+	WarnGhCollectorLockError:       "Failed to acquire distributed lock (proceeding anyway)",
+	ErrGhCollectorFetchRepo:        "Failed to fetch repository metadata",
+	ErrGhCollectorFetchRuns:        "Failed to fetch workflow runs",
+	ErrGhCollectorFetchJobs:        "Failed to fetch workflow jobs",
+	ErrGhCollectorFetchAnnotations: "Failed to fetch check-run annotations",
+	ErrGhCollectorNoRepos:          "No repositories configured for monitoring",
+	ErrGhCollectorParseRepo:        "Invalid repository format (expected owner/repo)",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "Enter the code at the URL to authenticate",
+	MsgAuthPolling:        "Waiting for GitHub authorisation…",
+	MsgAuthSuccess:        "Successfully authenticated with GitHub",
+	MsgAuthLoggedOut:      "GitHub credentials removed",
+	MsgAuthStatusLoggedIn: "Logged in to GitHub",
+	MsgAuthStatusNoToken:  "Not logged in — run 'scuffinger github auth' to authenticate",
+	MsgAuthTokenFromVault: "Using GitHub token from system vault",
+	ErrAuthNoClientID:     "github.client_id must be set in config for OAuth login",
+	ErrAuthDeviceCode:     "Failed to initiate GitHub device flow",
+	ErrAuthPoll:           "Failed to complete GitHub authorisation",
+	ErrAuthSaveToken:      "Failed to save token to system vault",
+	ErrAuthVerifyToken:    "Stored token is no longer valid",
+
+	// CLI commands
+	CmdRootShort:          "Scuffinger — a lightweight GitHub monitoring service",
+	CmdRootLong:           "Scuffinger is a lightweight service for monitoring GitHub repositories, workflows, and metrics. Built with Cobra, Viper, and Gin.",
+	CmdVersionShort:       "Print the version number",
+	CmdVersionLong:        "Displays the current version of the scuffinger application, including build information when available.",
+	CmdServeShort:         "Start the HTTP server",
+	CmdServeLong:          "Starts the Gin HTTP server with health checks, Prometheus metrics, and GitHub API endpoints. The server connects to all configured backing services on startup.",
+	CmdGitHubShort:        "GitHub authentication and status",
+	CmdGitHubLong:         "Manage GitHub OAuth authentication. Use subcommands to log in via device flow, check authentication status, or remove stored credentials.",
+	CmdGitHubAuthShort:    "Authenticate with GitHub using OAuth",
+	CmdGitHubAuthLong:     "Starts the GitHub OAuth device flow. You will be given a one-time code to enter at github.com/login/device. Once authorised, the token is stored securely in the system vault (Keychain on macOS, Credential Manager on Windows, or ~/.scuffinger/ on Linux).",
+	CmdGitHubStatusShort:  "Show current authentication status",
+	CmdGitHubStatusLong:   "Displays the current GitHub authentication status, including whether credentials are stored in the config file, environment, or system vault.",
+	CmdGitHubLogoutShort:  "Remove stored GitHub credentials",
+	CmdGitHubLogoutLong:   "Removes any GitHub OAuth tokens stored in the system vault. Does not affect tokens configured via config file or environment variables.",
+	CmdGitHubMonitorShort: "Start the GitHub repository collector",
+	CmdGitHubMonitorLong:  "Starts the background GitHub collector that periodically fetches repository metadata, workflow runs, and job step timings. Exposes health and Prometheus metrics endpoints but no API proxy routes. Designed to run as a separate process alongside the API server.",
+	CmdFlagConfig:         "Path to config file",
+}

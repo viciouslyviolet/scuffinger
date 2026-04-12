@@ -1,0 +1,24 @@
+{{- if .Values.collector.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-collector
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "collector") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+    {{- with .Values.collector.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.collector.service.type }}
+  ports:
+    - port: {{ .Values.collector.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "scuffinger.componentSelectorLabels" (list . "collector") | nindent 4 }}
+{{- end }}
+

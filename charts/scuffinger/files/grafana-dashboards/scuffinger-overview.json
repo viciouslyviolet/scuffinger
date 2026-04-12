@@ -1,0 +1,631 @@
+{
+  "uid": "scuffinger-overview",
+  "title": "Scuffinger — Overview",
+  "description": "High-level health, performance, and GitHub repository overview for Scuffinger.",
+  "tags": ["scuffinger"],
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "15s",
+  "time": { "from": "now-1h", "to": "now" },
+  "templating": { "list": [] },
+  "annotations": { "list": [] },
+  "links": [
+    {
+      "title": "GitHub Workflows",
+      "type": "link",
+      "icon": "external link",
+      "url": "/d/scuffinger-github-workflows",
+      "tooltip": "Detailed GitHub workflow runs and step timings",
+      "targetBlank": false
+    },
+    {
+      "title": "Job State Timeline",
+      "type": "link",
+      "icon": "external link",
+      "url": "/d/scuffinger-job-state-timeline",
+      "tooltip": "Workflow job state timeline",
+      "targetBlank": false
+    }
+  ],
+  "panels": [
+
+    {
+      "id": 100,
+      "type": "row",
+      "title": "⚡ System Status",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    {
+      "id": 1,
+      "title": "Uptime",
+      "description": "Time since the Scuffinger server process started.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "auto" },
+      "targets": [
+        { "expr": "scuffinger_uptime_seconds", "legendFormat": "uptime", "refId": "A" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Overall Health",
+      "description": "Aggregate health status across all backing services (Postgres, Valkey, etc.).",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "UNHEALTHY", "color": "red" }, "1": { "text": "HEALTHY", "color": "green" } } }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "auto" },
+      "targets": [
+        { "expr": "scuffinger_health_status", "legendFormat": "health", "refId": "A" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "In-Flight Requests",
+      "description": "Number of HTTP requests currently being processed by the server.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 100 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
+      "targets": [
+        { "expr": "scuffinger_http_requests_in_flight", "legendFormat": "in-flight", "refId": "A" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Rate Limit Remaining",
+      "description": "GitHub API core rate limit — remaining requests before throttling.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 100 },
+              { "color": "green", "value": 500 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
+      "targets": [
+        { "expr": "scuffinger_github_rate_limit_remaining", "legendFormat": "remaining", "refId": "A" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Service Health",
+      "description": "Per-service health status. Green = UP, Red = DOWN.",
+      "type": "table",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN ✗", "color": "red" }, "1": { "text": "UP ✓", "color": "green" } } }
+          ],
+          "custom": { "align": "center", "cellOptions": { "type": "color-background" } }
+        },
+        "overrides": []
+      },
+      "options": { "showHeader": true, "footer": { "show": false } },
+      "transformations": [
+        { "id": "labelsToFields", "options": {} },
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "instance": true, "job": true }, "renameByName": { "service": "Service", "Value": "Status" } } }
+      ],
+      "targets": [
+        { "expr": "scuffinger_health_service_status", "format": "table", "instant": true, "refId": "A" }
+      ]
+    },
+
+    {
+      "id": 101,
+      "type": "row",
+      "title": "📦 Repository & CI",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "collapsed": false
+    },
+    {
+      "id": 50,
+      "title": "⭐ Stars",
+      "description": "Total stargazers for monitored repositories.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "#FFCB47", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+      "targets": [
+        { "expr": "scuffinger_github_repo_stars", "legendFormat": "{{ repo }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 51,
+      "title": "🍴 Forks",
+      "description": "Total forks for monitored repositories.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "super-light-blue", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+      "targets": [
+        { "expr": "scuffinger_github_repo_forks", "legendFormat": "{{ repo }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 52,
+      "title": "🐛 Open Issues",
+      "description": "Number of open issues for monitored repositories.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5000 },
+              { "color": "orange", "value": 10000 },
+              { "color": "red", "value": 20000 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+      "targets": [
+        { "expr": "scuffinger_github_repo_open_issues", "legendFormat": "{{ repo }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 53,
+      "title": "📦 Repo Size",
+      "description": "Repository size on disk.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "kbytes",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "purple", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name" },
+      "targets": [
+        { "expr": "scuffinger_github_repo_size_kb", "legendFormat": "{{ repo }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 54,
+      "title": "🔄 Collection Cycles",
+      "description": "Total number of GitHub data collection cycles completed since startup.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "super-light-blue", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
+      "targets": [
+        { "expr": "scuffinger_github_collector_cycles_total", "legendFormat": "cycles", "refId": "A" }
+      ]
+    },
+    {
+      "id": 55,
+      "title": "⚠️ CI Failure Annotations",
+      "description": "Total failure-level annotations across all recent workflow runs. Navigate to the GitHub Workflows dashboard for details.",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "orange", "value": 10 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "auto" },
+      "targets": [
+        { "expr": "sum(scuffinger_github_workflow_annotation_total{annotation_level=\"failure\"}) or vector(0)", "legendFormat": "failures", "refId": "A" }
+      ]
+    },
+
+    {
+      "id": 102,
+      "type": "row",
+      "title": "🌐 HTTP Performance",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 10 },
+      "collapsed": false
+    },
+    {
+      "id": 10,
+      "title": "HTTP Request Rate",
+      "description": "Requests per second broken down by path.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 11 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "pointSize": 5, "lineWidth": 2 }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_http_requests_total[1m])) by (path)", "legendFormat": "{{ path }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "HTTP Request Duration (p50 / p95 / p99)",
+      "description": "Latency percentiles for all HTTP requests.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 11 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "pointSize": 5, "lineWidth": 2 }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum(rate(scuffinger_http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p50", "refId": "A" },
+        { "expr": "histogram_quantile(0.95, sum(rate(scuffinger_http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p95", "refId": "B" },
+        { "expr": "histogram_quantile(0.99, sum(rate(scuffinger_http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p99", "refId": "C" }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "HTTP Requests by Status Code",
+      "description": "Request rate grouped by HTTP status code. Green = 2xx, Yellow = 4xx, Red = 5xx.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 19 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": { "drawStyle": "bars", "fillOpacity": 80, "stacking": { "mode": "normal" } }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": "^2.." }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byRegexp", "options": "^4.." }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byRegexp", "options": "^5.." }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_http_requests_total[1m])) by (status)", "legendFormat": "{{ status }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "HTTP Error Rate (4xx + 5xx)",
+      "description": "Rate of client and server errors over time.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 19 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "4xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "5xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_http_requests_total{status=~\"4..\"}[1m]))", "legendFormat": "4xx", "refId": "A" },
+        { "expr": "sum(rate(scuffinger_http_requests_total{status=~\"5..\"}[1m]))", "legendFormat": "5xx", "refId": "B" }
+      ]
+    },
+
+    {
+      "id": 103,
+      "type": "row",
+      "title": "🐙 GitHub API",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 },
+      "collapsed": false
+    },
+    {
+      "id": 20,
+      "title": "GitHub API Call Rate",
+      "description": "Rate of outgoing GitHub API calls broken down by endpoint.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2 }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_github_api_calls_total[1m])) by (endpoint)", "legendFormat": "{{ endpoint }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 21,
+      "title": "GitHub API Error Rate",
+      "description": "Rate of failed GitHub API calls by endpoint.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byFrameRefID", "options": "A" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_github_api_errors_total[1m])) by (endpoint)", "legendFormat": "{{ endpoint }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 22,
+      "title": "GitHub API Duration (p95)",
+      "description": "95th-percentile latency of GitHub API calls by endpoint.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2 }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(scuffinger_github_api_duration_seconds_bucket[5m])) by (le, endpoint))", "legendFormat": "{{ endpoint }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 23,
+      "title": "GitHub Rate Limit Over Time",
+      "description": "GitHub API core rate limit remaining over time. Threshold lines show warning and danger zones.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "thresholdsStyle": { "mode": "line" } },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 100 },
+              { "color": "green", "value": 500 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "single" } },
+      "targets": [
+        { "expr": "scuffinger_github_rate_limit_remaining", "legendFormat": "remaining", "refId": "A" }
+      ]
+    },
+
+    {
+      "id": 104,
+      "type": "row",
+      "title": "🏥 Service Health",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 44 },
+      "collapsed": false
+    },
+    {
+      "id": 30,
+      "title": "Service Health Check Rate",
+      "description": "Rate of health-check pings sent to each backing service.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 45 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2 }
+        },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_service_health_checks_total[1m])) by (service)", "legendFormat": "{{ service }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 31,
+      "title": "Service Health Check Failures",
+      "description": "Rate of failed health-check pings per service. Any non-zero value indicates connectivity issues.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 45 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byFrameRefID", "options": "A" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_service_health_check_failures_total[1m])) by (service)", "legendFormat": "{{ service }}", "refId": "A" }
+      ]
+    },
+
+    {
+      "id": 105,
+      "type": "row",
+      "title": "📋 Logs",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 53 },
+      "collapsed": false
+    },
+    {
+      "id": 40,
+      "title": "Log Messages by Level",
+      "description": "Rate of log messages over time, stacked by severity level.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 54 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "cps",
+          "custom": { "drawStyle": "bars", "fillOpacity": 80, "stacking": { "mode": "normal" }, "lineWidth": 0 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "debug" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "info" },  "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "warn" },  "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "error" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_log_messages_total[1m])) by (level)", "legendFormat": "{{ level }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 41,
+      "title": "Error + Warning Logs",
+      "description": "Running total of error and warning log messages since startup.",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 54 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 10 },
+              { "color": "red", "value": 100 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area", "orientation": "horizontal", "textMode": "value_and_name" },
+      "targets": [
+        { "expr": "scuffinger_log_messages_total{level=\"error\"}", "legendFormat": "errors", "refId": "A" },
+        { "expr": "scuffinger_log_messages_total{level=\"warn\"}", "legendFormat": "warnings", "refId": "B" }
+      ]
+    },
+    {
+      "id": 42,
+      "title": "Application Logs (Loki)",
+      "description": "Live application log stream from Loki.",
+      "type": "logs",
+      "gridPos": { "h": 10, "w": 18, "x": 0, "y": 62 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "options": { "showTime": true, "showLabels": true, "showCommonLabels": false, "wrapLogMessage": true, "enableLogDetails": true, "sortOrder": "Descending", "dedupStrategy": "none" },
+      "targets": [
+        { "expr": "{service=\"app\"} | json", "refId": "A" }
+      ]
+    },
+    {
+      "id": 43,
+      "title": "Error Logs (Loki)",
+      "description": "Filtered view showing only ERROR-level logs.",
+      "type": "logs",
+      "gridPos": { "h": 10, "w": 6, "x": 18, "y": 62 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "options": { "showTime": true, "showLabels": false, "wrapLogMessage": true, "enableLogDetails": true, "sortOrder": "Descending", "dedupStrategy": "none" },
+      "targets": [
+        { "expr": "{service=\"app\"} | json | level = `ERROR`", "refId": "A" }
+      ]
+    }
+  ],
+  "schemaVersion": 39
+}
+

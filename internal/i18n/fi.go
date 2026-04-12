@@ -1,0 +1,141 @@
+package i18n
+
+// ── Suomi (Finnish) ──────────────────────────────────────────────────────────
+
+var Fi = Messages{
+	// Config
+	MsgConfigLoaded: "Asetukset ladattu",
+	ErrConfigLoad:   "Asetusten lataaminen epäonnistui",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "Yhdistetään taustapalveluihin",
+	MsgBootstrapSelfTests:   "Suoritetaan käynnistyksen itsetestejä",
+	MsgBootstrapTestsPassed: "Kaikki itsetestit läpäisty",
+	MsgBootstrapHealthStart: "Säännölliset terveystarkistukset käynnistetty",
+	ErrBootstrapConnect:     "Yhteyden muodostaminen vaadittuihin palveluihin epäonnistui",
+	ErrBootstrapSelfTests:   "Käynnistyksen itsetestit epäonnistuivat",
+
+	// Manager
+	MsgManagerConnecting:     "Yhdistetään palveluun",
+	MsgManagerConnected:      "Yhdistetty palveluun",
+	MsgManagerSelfTest:       "Suoritetaan itsetestiä",
+	MsgManagerSelfTestPassed: "Itsetesti läpäisty",
+	MsgManagerClosing:        "Suljetaan palveluja",
+	WarnManagerHealthFailed:  "Terveystarkistus epäonnistui",
+	ErrManagerConnect:        "Yhteys palveluun epäonnistui",
+	ErrManagerSelfTest:       "Palvelun itsetesti epäonnistui",
+	ErrManagerClose:          "Virhe palvelun sulkemisessa",
+	ErrManagerShutdown:       "Virheitä tapahtui sammutuksen aikana",
+
+	// Cache
+	MsgCacheSelfTestInit:   "Asetetaan init-avain nykyisellä aikaleimalla",
+	MsgCacheSelfTestPassed: "Välimuistin itsetesti läpäisty",
+	ErrCachePing:           "Välimuisti ei ole tavoitettavissa",
+	ErrCacheSetInit:        "Init-avaimen kirjoittaminen välimuistiin epäonnistui",
+	ErrCacheGetInit:        "Init-avaimen lukeminen välimuistista epäonnistui",
+	ErrCacheInitMismatch:   "Välimuistin init-arvo ei täsmää",
+
+	// Database
+	MsgDbCreatingTestDb:  "Luodaan väliaikaista testitietokantaa",
+	MsgDbRunningCrud:     "Suoritetaan CRUD-tarkistusta",
+	MsgDbSelfTestPassed:  "Tietokannan itsetesti läpäisty",
+	WarnDbDropTestFailed: "Testitietokantaa ei voitu poistaa (yritetään uudelleen seuraavassa käynnistyksessä)",
+	ErrDbConnect:         "Tietokanta ei ole tavoitettavissa",
+	ErrDbPing:            "Tietokanta ei vastannut ping-kyselyyn",
+	ErrDbCreateTestDb:    "Testitietokannan luominen epäonnistui",
+	ErrDbConnectTestDb:   "Yhteys testitietokantaan epäonnistui",
+	ErrDbCrud:            "Tietokannan CRUD-tarkistus epäonnistui",
+	ErrDbCreateTable:     "Testitaulun luominen epäonnistui",
+	ErrDbInsert:          "Testitietueen lisääminen epäonnistui",
+	ErrDbRead:            "Testitietueen lukeminen epäonnistui",
+	ErrDbReadMismatch:    "Testitietueen arvo ei vastaa odotettua",
+	ErrDbUpdate:          "Testitietueen päivittäminen epäonnistui",
+	ErrDbReadAfterUpdate: "Testitietueen lukeminen päivityksen jälkeen epäonnistui",
+	ErrDbUpdateMismatch:  "Päivitetyn testitietueen arvo ei vastaa odotettua",
+
+	// Server
+	MsgServerStarting: "HTTP-palvelin käynnistyy",
+	MsgServerShutdown: "HTTP-palvelinta sammutetaan",
+	MsgServerStopped:  "HTTP-palvelin pysähtyi hallitusti",
+	MsgServerRoutes:   "Reitit rekisteröity",
+	ErrServerListen:   "HTTP-palvelimella tapahtui virhe",
+	ErrServerShutdown: "HTTP-palvelin pakotettiin sammumaan",
+
+	// Health
+	MsgHealthReady:    "Kaikki palvelut ovat kunnossa",
+	MsgHealthNotReady: "Yksi tai useampi palvelu ei ole valmis",
+
+	// GitHub
+	MsgGhConnecting:      "Yhdistetään GitHub-rajapintaan",
+	MsgGhConnected:       "Yhdistetty GitHub-rajapintaan",
+	MsgGhAuthToken:       "Tunnistaudutaan henkilökohtaisella käyttöoikeustunnuksella",
+	MsgGhAuthApp:         "Tunnistaudutaan GitHub-sovelluksena",
+	MsgGhSelfTestPassed:  "GitHubin itsetesti läpäisty",
+	MsgGhRateRemaining:   "GitHub-rajapinnan nopeusrajoituksen tila",
+	WarnGhRateLow:        "GitHub-rajapinnan nopeusrajoitus on vähissä",
+	ErrGhNotConfigured:   "GitHubia ei ole määritetty — aseta tunnus tai sovelluksen tunnistetiedot",
+	ErrGhAuth:            "GitHub-tunnistautuminen epäonnistui",
+	ErrGhReadKey:         "GitHub-sovelluksen yksityisen avaimen lukeminen epäonnistui",
+	ErrGhParseKey:        "GitHub-sovelluksen yksityisen avaimen jäsentäminen epäonnistui",
+	ErrGhInstallToken:    "GitHub-sovelluksen asennustunnuksen hakeminen epäonnistui",
+	ErrGhSelfTest:        "GitHubin itsetesti epäonnistui",
+	ErrGhRateLimit:       "GitHub-rajapinnan nopeusrajoitus liian alhainen",
+	ErrGhFetchUser:       "GitHub-käyttäjän hakeminen epäonnistui",
+	ErrGhFetchOrg:        "GitHub-organisaation hakeminen epäonnistui",
+	ErrGhFetchRepo:       "GitHub-tietovaraston hakeminen epäonnistui",
+	ErrGhFetchBranches:   "Tietovaraston haarojen hakeminen epäonnistui",
+	ErrGhFetchWorkflows:  "Tietovaraston työnkulkujen hakeminen epäonnistui",
+	ErrGhFetchRuns:       "Työnkulun ajojen hakeminen epäonnistui",
+	ErrGhFetchRateLimit:  "GitHubin nopeusrajoituksen hakeminen epäonnistui",
+	ErrGhInvalidWorkflow: "Virheellinen työnkulun tunniste",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "GitHub-tietovarastokeräin käynnistyy",
+	MsgGhCollectorTick:             "Suoritetaan GitHub-keräyskiertoa",
+	MsgGhCollectorRepo:             "Kerätään tietovaraston tietoja",
+	MsgGhCollectorStopped:          "GitHub-tietovarastokeräin pysäytetty",
+	MsgGhCollectorPassed:           "GitHub-keräimen itsetesti läpäisty",
+	MsgGhCollectorAnnotations:      "Epäonnistuneen työn annotaatiot kerätty",
+	MsgGhCollectorLockAcquired:     "Keräyslukko hankittu tietovarastolle",
+	MsgGhCollectorLockSkipped:      "Tietovarasto ohitettu (toinen instanssi pitää lukkoa)",
+	WarnGhCollectorLockError:       "Hajautetun lukon hankkiminen epäonnistui (jatketaan silti)",
+	ErrGhCollectorFetchRepo:        "Tietovaraston metatietojen hakeminen epäonnistui",
+	ErrGhCollectorFetchRuns:        "Työnkulun ajojen hakeminen epäonnistui",
+	ErrGhCollectorFetchJobs:        "Työnkulun töiden hakeminen epäonnistui",
+	ErrGhCollectorFetchAnnotations: "Tarkistusajon annotaatioiden hakeminen epäonnistui",
+	ErrGhCollectorNoRepos:          "Seurattavia tietovarastoja ei ole määritetty",
+	ErrGhCollectorParseRepo:        "Virheellinen tietovarastomuoto (odotettu: omistaja/repo)",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "Syötä koodi URL-osoitteessa tunnistautuaksesi",
+	MsgAuthPolling:        "Odotetaan GitHub-valtuutusta…",
+	MsgAuthSuccess:        "GitHub-tunnistautuminen onnistui",
+	MsgAuthLoggedOut:      "GitHub-tunnistetiedot poistettu",
+	MsgAuthStatusLoggedIn: "Kirjautunut GitHubiin",
+	MsgAuthStatusNoToken:  "Ei kirjautunut — suorita 'scuffinger github auth' tunnistautuaksesi",
+	MsgAuthTokenFromVault: "Käytetään GitHub-tunnusta järjestelmän holvista",
+	ErrAuthNoClientID:     "github.client_id on asetettava OAuth-kirjautumista varten",
+	ErrAuthDeviceCode:     "GitHub-laitevirran käynnistäminen epäonnistui",
+	ErrAuthPoll:           "GitHub-valtuutuksen viimeistely epäonnistui",
+	ErrAuthSaveToken:      "Tunnuksen tallentaminen järjestelmän holviin epäonnistui",
+	ErrAuthVerifyToken:    "Tallennettu tunnus ei ole enää voimassa",
+
+	// CLI commands
+	CmdRootShort:         "Scuffinger — kevyt GitHub-seurantapalvelu",
+	CmdRootLong:          "Scuffinger on kevyt palvelu GitHub-tietovarastojen, työnkulkujen ja mittareiden seurantaan. Rakennettu Cobralla, Viperillä ja Ginillä.",
+	CmdVersionShort:      "Näytä versionumero",
+	CmdVersionLong:       "Näyttää scuffinger-sovelluksen nykyisen version, mukaan lukien käännöstiedot jos saatavilla.",
+	CmdServeShort:        "Käynnistä HTTP-palvelin",
+	CmdServeLong:         "Käynnistää Gin HTTP-palvelimen terveystarkistuksilla, Prometheus-mittareilla ja GitHub API -päätepisteillä. Palvelin yhdistää kaikkiin määritettyihin taustapalveluihin käynnistyksessä.",
+	CmdGitHubShort:       "GitHub-tunnistautuminen ja tila",
+	CmdGitHubLong:        "Hallitse GitHub OAuth -tunnistautumista. Käytä alikomentoja kirjautuaksesi laitevirran kautta, tarkistaaksesi tunnistautumistilan tai poistaaksesi tallennettuja tunnistetietoja.",
+	CmdGitHubAuthShort:   "Tunnistaudu GitHubiin OAuthilla",
+	CmdGitHubAuthLong:    "Käynnistää GitHub OAuth -laitevirran. Saat kertakäyttökoodin syötettäväksi osoitteessa github.com/login/device. Valtuutuksen jälkeen tunnus tallennetaan turvallisesti järjestelmän holviin.",
+	CmdGitHubStatusShort: "Näytä nykyinen tunnistautumistila",
+	CmdGitHubStatusLong:  "Näyttää nykyisen GitHub-tunnistautumistilan, mukaan lukien onko tunnistetiedot tallennettu asetustiedostoon, ympäristömuuttujiin vai järjestelmän holviin.",
+	CmdGitHubLogoutShort: "Poista tallennetut GitHub-tunnistetiedot",
+	CmdGitHubLogoutLong:  "Poistaa kaikki järjestelmän holviin tallennetut GitHub OAuth -tunnukset. Ei vaikuta asetustiedoston tai ympäristömuuttujien kautta määritettyihin tunnuksiin.",
+	CmdGitHubMonitorShort: "Käynnistä GitHub-tietovarastojen kerääjä",
+	CmdGitHubMonitorLong:  "Käynnistää tausta-GitHub-kerääjän, joka hakee säännöllisesti tietovarastojen metatiedot, työnkulkujen suoritukset ja työvaiheaikataulut. Tarjoaa terveys- ja Prometheus-mittaripäätepisteet, mutta ei API-välityspalvelinreittejä. Suunniteltu ajettavaksi erillisenä prosessina API-palvelimen rinnalla.",
+	CmdFlagConfig:        "Polku asetustiedostoon",
+}

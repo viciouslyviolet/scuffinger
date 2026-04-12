@@ -1,0 +1,149 @@
+services:
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: scuffinger-valkey
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/valkey:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: scuffinger-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: scuffinger
+      POSTGRES_PASSWORD: scuffinger
+      POSTGRES_DB: scuffinger
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scuffinger"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    container_name: scuffinger-api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data/app:/app/data
+    environment:
+      SCUFFINGER_SERVER_HOST: "0.0.0.0"
+      SCUFFINGER_SERVER_PORT: "8080"
+      SCUFFINGER_DATABASE_HOST: postgres
+      SCUFFINGER_DATABASE_PORT: "5432"
+      SCUFFINGER_DATABASE_USER: scuffinger
+      SCUFFINGER_DATABASE_PASSWORD: scuffinger
+      SCUFFINGER_DATABASE_NAME: scuffinger
+      SCUFFINGER_DATABASE_SSLMODE: disable
+      SCUFFINGER_CACHE_HOST: valkey
+      SCUFFINGER_CACHE_PORT: "6379"
+    command: ["serve", "--config", "/app/config/config.yaml"]
+    depends_on:
+      valkey:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    container_name: scuffinger-collector
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./data/app:/app/data
+    environment:
+      SCUFFINGER_SERVER_HOST: "0.0.0.0"
+      SCUFFINGER_SERVER_PORT: "8081"
+      SCUFFINGER_DATABASE_HOST: postgres
+      SCUFFINGER_DATABASE_PORT: "5432"
+      SCUFFINGER_DATABASE_USER: scuffinger
+      SCUFFINGER_DATABASE_PASSWORD: scuffinger
+      SCUFFINGER_DATABASE_NAME: scuffinger
+      SCUFFINGER_DATABASE_SSLMODE: disable
+      SCUFFINGER_CACHE_HOST: valkey
+      SCUFFINGER_CACHE_PORT: "6379"
+    command: ["github", "monitor", "--config", "/app/config/config.yaml"]
+    depends_on:
+      valkey:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  # ── Monitoring stack ──────────────────────────────────────────────
+
+  prometheus:
+    image: prom/prometheus:v3.4.0
+    container_name: scuffinger-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./data/prometheus:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=7d"
+    depends_on:
+      - api
+      - collector
+
+  loki:
+    image: grafana/loki:3.5.0
+    container_name: scuffinger-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./monitoring/loki/loki.yml:/etc/loki/local-config.yaml:ro
+      - ./data/loki:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --output-document=- http://localhost:3100/ready | grep -q ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  promtail:
+    image: grafana/promtail:3.5.0
+    container_name: scuffinger-promtail
+    volumes:
+      - ./monitoring/promtail/promtail.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      loki:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: scuffinger-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: scuffinger
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/json/scuffinger-overview.json
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./data/grafana:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+
+

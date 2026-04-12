@@ -1,0 +1,17 @@
+{{- if and .Values.postgresql.enabled .Values.postgresql.initScripts }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-postgresql-init
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "postgresql") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+data:
+  {{- range $key, $val := .Values.postgresql.initScripts }}
+  {{ $key }}: |
+    {{- $val | nindent 4 }}
+  {{- end }}
+{{- end }}
+

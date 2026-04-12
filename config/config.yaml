@@ -1,0 +1,41 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+log:
+  level: "info"
+  format: "json"
+
+app:
+  name: "scuffinger"
+  version: "0.1.0"
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "scuffinger"
+  password: "scuffinger"
+  name: "scuffinger"
+  sslmode: "disable"
+
+cache:
+  host: "localhost"
+  port: 6379
+  github_cache_ttl: "5m"           # ValKey TTL for cached GitHub API responses
+
+github:
+  tokens:                          # Personal access token (PAT) — or use app auth below
+    - "github_pat_*"
+  applications:                    # GitHub App credentials (alternative to PAT)
+    - client_id: ""                # OAuth App client ID — required for 'GitHub auth' device flow
+      app_id: 0                    # GitHub App ID (alternative to token)
+      installation_id: 0           # GitHub App installation ID
+      private_key_path: ""         # Path to GitHub App private key PEM file
+  organization: ""                 # Optional: scope API calls to this org
+  rate_limit_threshold: 100        # Minimum remaining requests before unhealthy
+  collector_interval: "5m"         # How often the background collector runs
+  max_recent_runs: 50              # Number of recent workflow runs to track per workflow
+  fetch_annotations: true          # Fetch check-run annotations from failed workflow runs
+  repositories:                    # Repositories to monitor (owner/repo format)
+    - "*"
+

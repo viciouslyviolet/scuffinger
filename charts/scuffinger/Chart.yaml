@@ -1,0 +1,19 @@
+apiVersion: v2
+name: scuffinger
+description: A lightweight GitHub monitoring service with PostgreSQL, ValKey, and a full observability stack.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - github
+  - monitoring
+  - prometheus
+  - grafana
+  - golang
+home: https://github.com/your-org/scuffinger
+maintainers:
+  - name: scuffinger
+sources:
+  - https://github.com/your-org/scuffinger
+dependencies: []
+

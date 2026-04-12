@@ -1,0 +1,133 @@
+{{- if .Values.collector.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-collector
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "collector") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+spec:
+  {{- if not .Values.collector.autoscaling.enabled }}
+  replicas: {{ .Values.collector.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "scuffinger.componentSelectorLabels" (list . "collector") | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/app/configmap.yaml") . | sha256sum }}
+        {{- with .Values.collector.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "scuffinger.componentSelectorLabels" (list . "collector") | nindent 8 }}
+        {{- with .Values.collector.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- include "scuffinger.imagePullSecrets" (dict "Values" .Values "secrets" .Values.app.imagePullSecrets) | nindent 6 }}
+      serviceAccountName: {{ include "scuffinger.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.app.podSecurityContext | nindent 8 }}
+      {{- with .Values.collector.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.collector.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.collector.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.collector.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: collector
+          image: {{ include "scuffinger.collectorImage" . }}
+          imagePullPolicy: {{ include "scuffinger.collectorImagePullPolicy" . }}
+          securityContext:
+            {{- toYaml .Values.app.securityContext | nindent 12 }}
+          args:
+            - github
+            - monitor
+            - --config
+            - /app/config/config.yaml
+          ports:
+            - name: http
+              containerPort: {{ .Values.collector.service.port }}
+              protocol: TCP
+          env:
+            - name: SCUFFINGER_SERVER_HOST
+              value: "0.0.0.0"
+            - name: SCUFFINGER_SERVER_PORT
+              value: {{ .Values.collector.service.port | quote }}
+            - name: SCUFFINGER_DATABASE_HOST
+              value: {{ include "scuffinger.postgresql.host" . | quote }}
+            - name: SCUFFINGER_DATABASE_PORT
+              value: {{ .Values.postgresql.service.port | quote }}
+            - name: SCUFFINGER_DATABASE_USER
+              value: {{ .Values.postgresql.auth.username | quote }}
+            {{- if .Values.app.existingSecret }}
+            - name: SCUFFINGER_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.app.existingSecret }}
+                  key: SCUFFINGER_DATABASE_PASSWORD
+                  optional: true
+            - name: SCUFFINGER_GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.app.existingSecret }}
+                  key: SCUFFINGER_GITHUB_TOKEN
+                  optional: true
+            {{- else if not .Values.postgresql.auth.existingSecret }}
+            - name: SCUFFINGER_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "scuffinger.fullname" . }}-postgresql
+                  key: postgresql-password
+            {{- end }}
+            - name: SCUFFINGER_DATABASE_NAME
+              value: {{ .Values.postgresql.auth.database | quote }}
+            - name: SCUFFINGER_DATABASE_SSLMODE
+              value: "disable"
+            - name: SCUFFINGER_CACHE_HOST
+              value: {{ include "scuffinger.valkey.host" . | quote }}
+            - name: SCUFFINGER_CACHE_PORT
+              value: {{ .Values.valkey.service.port | quote }}
+            {{- with .Values.collector.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.collector.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.collector.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.collector.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            {{- with .Values.collector.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "scuffinger.fullname" . }}-config
+        - name: tmp
+          emptyDir: {}
+        {{- with .Values.collector.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+{{- end }}
+

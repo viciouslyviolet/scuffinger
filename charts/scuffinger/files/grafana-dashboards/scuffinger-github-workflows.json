@@ -1,0 +1,311 @@
+{
+  "uid": "scuffinger-github-workflows",
+  "title": "Scuffinger — GitHub Workflows",
+  "tags": ["scuffinger", "github", "workflows"],
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "repo",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(scuffinger_github_repo_info, repo)",
+        "query": "label_values(scuffinger_github_repo_info, repo)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "multi": false,
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "workflow",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(scuffinger_github_workflow_run_duration_seconds{repo=~\"$repo\"}, workflow)",
+        "query": "label_values(scuffinger_github_workflow_run_duration_seconds{repo=~\"$repo\"}, workflow)",
+        "refresh": 2,
+        "sort": 1,
+        "includeAll": true,
+        "multi": false,
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "run_id",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(scuffinger_github_workflow_step_duration_seconds{repo=~\"$repo\", workflow=~\"$workflow\"}, run_id)",
+        "query": "label_values(scuffinger_github_workflow_step_duration_seconds{repo=~\"$repo\", workflow=~\"$workflow\"}, run_id)",
+        "refresh": 2,
+        "sort": 2,
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Repository Overview",
+      "type": "table",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "left" } },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Stars" },       "properties": [{ "id": "custom.align", "value": "center" }] },
+          { "matcher": { "id": "byName", "options": "Forks" },       "properties": [{ "id": "custom.align", "value": "center" }] },
+          { "matcher": { "id": "byName", "options": "Open Issues" }, "properties": [{ "id": "custom.align", "value": "center" }] },
+          { "matcher": { "id": "byName", "options": "Size (KB)" },   "properties": [{ "id": "custom.align", "value": "center" }] }
+        ]
+      },
+      "options": { "showHeader": true, "footer": { "show": false } },
+      "targets": [
+        { "expr": "scuffinger_github_repo_stars{repo=~\"$repo\"}", "format": "table", "instant": true, "refId": "A" },
+        { "expr": "scuffinger_github_repo_forks{repo=~\"$repo\"}", "format": "table", "instant": true, "refId": "B" },
+        { "expr": "scuffinger_github_repo_open_issues{repo=~\"$repo\"}", "format": "table", "instant": true, "refId": "C" },
+        { "expr": "scuffinger_github_repo_size_kb{repo=~\"$repo\"}", "format": "table", "instant": true, "refId": "D" }
+      ],
+      "transformations": [
+        { "id": "seriesToColumns", "options": { "byField": "repo" } },
+        { "id": "organize", "options": {
+          "excludeByName": { "Time 1": true, "Time 2": true, "Time 3": true, "Time 4": true, "__name__ 1": true, "__name__ 2": true, "__name__ 3": true, "__name__ 4": true, "instance 1": true, "instance 2": true, "instance 3": true, "instance 4": true, "job 1": true, "job 2": true, "job 3": true, "job 4": true },
+          "renameByName": { "repo": "Repository", "Value 1": "Stars", "Value 2": "Forks", "Value 3": "Open Issues", "Value 4": "Size (KB)" }
+        }}
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Repository Info",
+      "type": "table",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "custom": { "align": "center" } },
+        "overrides": []
+      },
+      "options": { "showHeader": true, "footer": { "show": false } },
+      "targets": [
+        { "expr": "scuffinger_github_repo_info{repo=~\"$repo\"}", "format": "table", "instant": true, "refId": "A" }
+      ],
+      "transformations": [
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "__name__": true, "instance": true, "job": true, "Value": true },
+          "renameByName": { "repo": "Repository", "language": "Language", "default_branch": "Default Branch", "archived": "Archived" }
+        }}
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Workflow Run Duration Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "pointSize": 5 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*success.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byRegexp", "options": ".*failure.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "scuffinger_github_workflow_run_duration_seconds{repo=~\"$repo\", workflow=~\"$workflow\"}", "legendFormat": "{{ workflow }} #{{ run_id }} ({{ conclusion }})", "refId": "A" }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Latest Workflow Status",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "1": { "text": "●" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "text", "value": null }] }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*success.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byRegexp", "options": ".*failure.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] },
+          { "matcher": { "id": "byRegexp", "options": ".*in_progress.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "name" },
+      "targets": [
+        { "expr": "scuffinger_github_workflow_run_status{repo=~\"$repo\", workflow=~\"$workflow\"}", "legendFormat": "{{ workflow }} — {{ conclusion }}", "refId": "A" }
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Workflow Step Gantt — Run #$run_id",
+      "description": "Each bar shows the duration of a single CI step within the selected workflow run. Steps are grouped by job name.",
+      "type": "barchart",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "fillOpacity": 80 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 30 },
+              { "color": "orange", "value": 60 },
+              { "color": "red", "value": 120 }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "barWidth": 0.7,
+        "groupWidth": 0.8,
+        "legend": { "displayMode": "list", "placement": "right" },
+        "tooltip": { "mode": "multi" },
+        "xTickLabelRotation": 0
+      },
+      "targets": [
+        {
+          "expr": "scuffinger_github_workflow_step_duration_seconds{repo=~\"$repo\", workflow=~\"$workflow\", run_id=~\"$run_id\"}",
+          "legendFormat": "{{ job }} → {{ step }}",
+          "refId": "A",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "__name__": true, "instance": true, "job": true, "repo": true, "workflow": true, "run_id": true },
+          "renameByName": { "Value": "Duration (s)" }
+        }},
+        { "id": "sortBy", "options": { "fields": {}, "sort": [{ "field": "Duration (s)", "desc": true }] } }
+      ]
+    },
+    {
+      "id": 21,
+      "title": "Step Timeline — Run #$run_id",
+      "description": "State timeline view showing when each step started and how long it took. Select a specific run_id to see its steps laid out over time.",
+      "type": "state-timeline",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 38 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 80 },
+          "color": { "mode": "continuous-GrYlRd" },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "showValue": "auto",
+        "mergeValues": false,
+        "alignValue": "left",
+        "rowHeight": 0.8,
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "scuffinger_github_workflow_step_duration_seconds{repo=~\"$repo\", workflow=~\"$workflow\", run_id=~\"$run_id\"}",
+          "legendFormat": "{{ job }} → {{ step }}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "title": "Step Duration Breakdown (Table) — Run #$run_id",
+      "type": "table",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 50 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "left" }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Duration (s)" }, "properties": [
+            { "id": "unit", "value": "s" },
+            { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } },
+            { "id": "thresholds", "value": { "mode": "absolute", "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 30 },
+              { "color": "red", "value": 120 }
+            ]}}
+          ]},
+          { "matcher": { "id": "byName", "options": "Conclusion" }, "properties": [
+            { "id": "mappings", "value": [
+              { "type": "value", "options": { "success": { "text": "✅ success", "color": "green" }, "failure": { "text": "❌ failure", "color": "red" }, "skipped": { "text": "⏭ skipped", "color": "blue" } } }
+            ]}
+          ]}
+        ]
+      },
+      "options": { "showHeader": true, "footer": { "show": false }, "sortBy": [{ "displayName": "Duration (s)", "desc": true }] },
+      "targets": [
+        {
+          "expr": "scuffinger_github_workflow_step_duration_seconds{repo=~\"$repo\", workflow=~\"$workflow\", run_id=~\"$run_id\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "__name__": true, "instance": true, "job": true, "repo": true, "workflow": true, "run_id": true },
+          "indexByName": { "step": 0, "conclusion": 1, "Value": 2 },
+          "renameByName": { "step": "Step", "conclusion": "Conclusion", "Value": "Duration (s)" }
+        }}
+      ]
+    },
+    {
+      "id": 40,
+      "title": "Collector Health",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 60 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
+      "targets": [
+        { "expr": "scuffinger_github_collector_cycles_total", "legendFormat": "collection cycles", "refId": "A" }
+      ]
+    },
+    {
+      "id": 41,
+      "title": "Collector Errors",
+      "type": "timeseries",
+      "gridPos": { "h": 4, "w": 16, "x": 8, "y": 60 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2 }
+        },
+        "overrides": [
+          { "matcher": { "id": "byFrameRefID", "options": "A" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["sum"] }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "expr": "sum(rate(scuffinger_github_collector_errors_total[5m])) by (repo)", "legendFormat": "{{ repo }}", "refId": "A" }
+      ]
+    }
+  ],
+  "schemaVersion": 39
+}
+

@@ -1,0 +1,29 @@
+# Build artifacts
+bin/
+
+# Docker data volumes
+data/
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Test coverage
+coverage/
+
+# Temporary files
+tmp/

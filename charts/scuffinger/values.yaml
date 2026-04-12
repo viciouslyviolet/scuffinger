@@ -1,0 +1,499 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Scuffinger Helm Chart — values.yaml
+# Every field is documented and overridable for GitOps (ArgoCD) workflows.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── Global settings ───────────────────────────────────────────────────────────
+global:
+  # Override the chart's default image pull secrets for all sub-components.
+  imagePullSecrets: []
+  # -- Annotations applied to every resource (useful for ArgoCD tracking).
+  commonAnnotations: {}
+  # -- Labels applied to every resource.
+  commonLabels: {}
+
+# ── Scuffinger application ────────────────────────────────────────────────────
+app:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/your-org/scuffinger
+    tag: ""            # defaults to .Chart.AppVersion
+    pullPolicy: IfNotPresent
+
+  # -- Extra image pull secrets (merged with global).
+  imagePullSecrets: []
+
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop: [ALL]
+
+  service:
+    type: ClusterIP
+    port: 8080
+    annotations: {}
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: scuffinger.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+    #  - secretName: scuffinger-tls
+    #    hosts:
+    #      - scuffinger.local
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+
+  # -- Extra environment variables (list of {name, value} or {name, valueFrom}).
+  extraEnv: []
+
+  # -- Extra volumes and volume mounts for the app container.
+  extraVolumes: []
+  extraVolumeMounts: []
+
+  # -- Liveness probe configuration.
+  livenessProbe:
+    httpGet:
+      path: /health/live
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  # -- Readiness probe configuration.
+  readinessProbe:
+    httpGet:
+      path: /health/ready
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+
+  # -- Scuffinger application configuration.
+  # These map 1:1 to config/config.yaml and are injected via env vars.
+  config:
+    server:
+      host: "0.0.0.0"
+      port: 8080
+    log:
+      level: "info"
+      format: "json"
+    app:
+      name: "scuffinger"
+      version: "0.1.0"
+    github:
+      token: ""
+      clientId: ""
+      appId: 0
+      installationId: 0
+      privateKeyPath: ""
+      organization: ""
+      rateLimitThreshold: 100
+      collectorInterval: "5m"
+      maxRecentRuns: 5
+      fetchAnnotations: true
+      repositories: []
+    cache:
+      githubCacheTtl: "5m"
+
+  # -- Reference an existing Secret for sensitive values (e.g. GitHub token).
+  # Keys: SCUFFINGER_GITHUB_TOKEN, SCUFFINGER_DATABASE_PASSWORD, etc.
+  existingSecret: ""
+
+  # ServiceMonitor for Prometheus Operator (auto-discovered scraping).
+  serviceMonitor:
+    enabled: false
+    interval: 15s
+    scrapeTimeout: 10s
+    path: /metrics
+    labels: {}
+    namespace: ""
+    honorLabels: false
+    metricRelabelings: []
+    relabelings: []
+
+# ── Scuffinger collector ───────────────────────────────────────────────────────
+# Runs `github monitor` — the background GitHub data collection loop.
+# Shares the same image, config, and backing services as the API.
+collector:
+  enabled: true
+  replicaCount: 1
+
+  # -- Uses the same image as the app by default.
+  image:
+    repository: ""   # defaults to app.image.repository
+    tag: ""          # defaults to app.image.tag / .Chart.AppVersion
+    pullPolicy: ""   # defaults to app.image.pullPolicy
+
+  podAnnotations: {}
+  podLabels: {}
+
+  service:
+    type: ClusterIP
+    port: 8081
+    annotations: {}
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+
+  # -- Extra environment variables (list of {name, value} or {name, valueFrom}).
+  extraEnv: []
+
+  # -- Extra volumes and volume mounts for the collector container.
+  extraVolumes: []
+  extraVolumeMounts: []
+
+  # -- Liveness probe configuration.
+  livenessProbe:
+    httpGet:
+      path: /health/live
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+  # -- Readiness probe configuration.
+  readinessProbe:
+    httpGet:
+      path: /health/ready
+      port: http
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+
+  # ServiceMonitor for Prometheus Operator (auto-discovered scraping).
+  serviceMonitor:
+    enabled: false
+    interval: 15s
+    scrapeTimeout: 10s
+    path: /metrics
+    labels: {}
+    namespace: ""
+    honorLabels: false
+    metricRelabelings: []
+    relabelings: []
+
+# ── PostgreSQL ────────────────────────────────────────────────────────────────
+postgresql:
+  enabled: true
+
+  image:
+    repository: postgres
+    tag: "17-alpine"
+    pullPolicy: IfNotPresent
+
+  auth:
+    username: scuffinger
+    password: scuffinger
+    database: scuffinger
+    # -- Use an existing secret instead of creating one. Key: postgresql-password
+    existingSecret: ""
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+    annotations: {}
+    existingClaim: ""
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  # -- Extra PostgreSQL configuration (appended to postgresql.conf).
+  extraConfig: ""
+
+  # -- Init scripts executed at first boot (ConfigMap mounted to /docker-entrypoint-initdb.d).
+  initScripts: {}
+    # 01-create-extensions.sql: |
+    #   CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+# ── ValKey (Redis-compatible cache) ───────────────────────────────────────────
+valkey:
+  enabled: true
+
+  image:
+    repository: valkey/valkey
+    tag: "8-alpine"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 6379
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+    annotations: {}
+    existingClaim: ""
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+  # -- Extra ValKey CLI arguments (e.g. --maxmemory 100mb).
+  extraArgs: []
+
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# ── Prometheus ────────────────────────────────────────────────────────────────
+prometheus:
+  enabled: true
+
+  image:
+    repository: prom/prometheus
+    tag: "v3.4.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 9090
+
+  retention: 7d
+
+  scrapeInterval: 15s
+  evaluationInterval: 15s
+
+  # -- Extra scrape configs appended to prometheus.yml.
+  extraScrapeConfigs: []
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+    annotations: {}
+    existingClaim: ""
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# ── Loki ──────────────────────────────────────────────────────────────────────
+loki:
+  enabled: true
+
+  image:
+    repository: grafana/loki
+    tag: "3.5.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 3100
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+    annotations: {}
+    existingClaim: ""
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+  # -- Override the default Loki configuration.
+  config: {}
+
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# ── Promtail ──────────────────────────────────────────────────────────────────
+promtail:
+  enabled: true
+
+  image:
+    repository: grafana/promtail
+    tag: "3.5.0"
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+  # -- Extra Promtail scrape configs.
+  extraScrapeConfigs: []
+
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# ── Grafana ───────────────────────────────────────────────────────────────────
+grafana:
+  enabled: true
+
+  image:
+    repository: grafana/grafana
+    tag: "11.6.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: grafana.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+  admin:
+    user: admin
+    password: scuffinger
+    # -- Use an existing secret. Keys: admin-user, admin-password
+    existingSecret: ""
+
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi
+    annotations: {}
+    existingClaim: ""
+
+  # -- Disable anonymous sign-up.
+  allowSignUp: false
+
+  # -- Provision built-in dashboards (scuffinger-overview, scuffinger-github-workflows).
+  dashboards:
+    enabled: true
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+  # -- Extra environment variables for Grafana.
+  extraEnv: []
+
+  podAnnotations: {}
+  podLabels: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+

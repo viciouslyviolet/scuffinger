@@ -1,0 +1,141 @@
+package i18n
+
+// ── Deutsch (German) ─────────────────────────────────────────────────────────
+
+var De = Messages{
+	// Config
+	MsgConfigLoaded: "Konfiguration geladen",
+	ErrConfigLoad:   "Konfiguration konnte nicht geladen werden",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "Verbindung zu Hintergrunddiensten wird hergestellt",
+	MsgBootstrapSelfTests:   "Start-Selbsttests werden ausgeführt",
+	MsgBootstrapTestsPassed: "Alle Selbsttests bestanden",
+	MsgBootstrapHealthStart: "Periodische Gesundheitsprüfungen gestartet",
+	ErrBootstrapConnect:     "Verbindung zu erforderlichen Diensten nicht möglich",
+	ErrBootstrapSelfTests:   "Start-Selbsttests fehlgeschlagen",
+
+	// Manager
+	MsgManagerConnecting:     "Verbindung zum Dienst wird hergestellt",
+	MsgManagerConnected:      "Mit Dienst verbunden",
+	MsgManagerSelfTest:       "Selbsttest wird ausgeführt",
+	MsgManagerSelfTestPassed: "Selbsttest bestanden",
+	MsgManagerClosing:        "Dienste werden heruntergefahren",
+	WarnManagerHealthFailed:  "Gesundheitsprüfung fehlgeschlagen",
+	ErrManagerConnect:        "Verbindung zum Dienst fehlgeschlagen",
+	ErrManagerSelfTest:       "Selbsttest für Dienst fehlgeschlagen",
+	ErrManagerClose:          "Fehler beim Schließen des Dienstes",
+	ErrManagerShutdown:       "Fehler beim Herunterfahren aufgetreten",
+
+	// Cache
+	MsgCacheSelfTestInit:   "Init-Schlüssel wird mit aktuellem Zeitstempel gesetzt",
+	MsgCacheSelfTestPassed: "Cache-Selbsttest bestanden",
+	ErrCachePing:           "Cache ist nicht erreichbar",
+	ErrCacheSetInit:        "Init-Schlüssel konnte nicht in den Cache geschrieben werden",
+	ErrCacheGetInit:        "Init-Schlüssel konnte nicht aus dem Cache gelesen werden",
+	ErrCacheInitMismatch:   "Cache-Init-Wert stimmt nicht überein",
+
+	// Database
+	MsgDbCreatingTestDb:  "Temporäre Testdatenbank wird erstellt",
+	MsgDbRunningCrud:     "CRUD-Überprüfung wird ausgeführt",
+	MsgDbSelfTestPassed:  "Datenbank-Selbsttest bestanden",
+	WarnDbDropTestFailed: "Testdatenbank konnte nicht gelöscht werden (wird beim nächsten Start erneut versucht)",
+	ErrDbConnect:         "Datenbank ist nicht erreichbar",
+	ErrDbPing:            "Datenbank hat nicht auf Ping geantwortet",
+	ErrDbCreateTestDb:    "Testdatenbank konnte nicht erstellt werden",
+	ErrDbConnectTestDb:   "Verbindung zur Testdatenbank fehlgeschlagen",
+	ErrDbCrud:            "CRUD-Überprüfung der Datenbank fehlgeschlagen",
+	ErrDbCreateTable:     "Testtabelle konnte nicht erstellt werden",
+	ErrDbInsert:          "Testdatensatz konnte nicht eingefügt werden",
+	ErrDbRead:            "Testdatensatz konnte nicht gelesen werden",
+	ErrDbReadMismatch:    "Testdatensatzwert stimmt nicht mit dem Erwarteten überein",
+	ErrDbUpdate:          "Testdatensatz konnte nicht aktualisiert werden",
+	ErrDbReadAfterUpdate: "Testdatensatz konnte nach Aktualisierung nicht gelesen werden",
+	ErrDbUpdateMismatch:  "Aktualisierter Testdatensatzwert stimmt nicht mit dem Erwarteten überein",
+
+	// Server
+	MsgServerStarting: "HTTP-Server wird gestartet",
+	MsgServerShutdown: "HTTP-Server wird heruntergefahren",
+	MsgServerStopped:  "HTTP-Server wurde ordnungsgemäß gestoppt",
+	MsgServerRoutes:   "Routen registriert",
+	ErrServerListen:   "HTTP-Server hat einen Fehler festgestellt",
+	ErrServerShutdown: "HTTP-Server wurde zum Herunterfahren gezwungen",
+
+	// Health
+	MsgHealthReady:    "Alle Dienste sind gesund",
+	MsgHealthNotReady: "Ein oder mehrere Dienste sind nicht bereit",
+
+	// GitHub
+	MsgGhConnecting:      "Verbindung zur GitHub-API wird hergestellt",
+	MsgGhConnected:       "Mit GitHub-API verbunden",
+	MsgGhAuthToken:       "Authentifizierung mit persönlichem Zugriffstoken",
+	MsgGhAuthApp:         "Authentifizierung als GitHub-App",
+	MsgGhSelfTestPassed:  "GitHub-Selbsttest bestanden",
+	MsgGhRateRemaining:   "Status des GitHub-API-Ratenlimits",
+	WarnGhRateLow:        "Das GitHub-API-Ratenlimit wird knapp",
+	ErrGhNotConfigured:   "GitHub ist nicht konfiguriert — Token oder App-Anmeldedaten festlegen",
+	ErrGhAuth:            "GitHub-Authentifizierung fehlgeschlagen",
+	ErrGhReadKey:         "Fehler beim Lesen der privaten Schlüsseldatei der GitHub-App",
+	ErrGhParseKey:        "Fehler beim Parsen des privaten Schlüssels der GitHub-App",
+	ErrGhInstallToken:    "Fehler beim Abrufen des Installationstokens der GitHub-App",
+	ErrGhSelfTest:        "GitHub-Selbsttest fehlgeschlagen",
+	ErrGhRateLimit:       "GitHub-API-Ratenlimit zu niedrig",
+	ErrGhFetchUser:       "Fehler beim Abrufen des GitHub-Benutzers",
+	ErrGhFetchOrg:        "Fehler beim Abrufen der GitHub-Organisation",
+	ErrGhFetchRepo:       "Fehler beim Abrufen des GitHub-Repositorys",
+	ErrGhFetchBranches:   "Fehler beim Abrufen der Repository-Branches",
+	ErrGhFetchWorkflows:  "Fehler beim Abrufen der Repository-Workflows",
+	ErrGhFetchRuns:       "Fehler beim Abrufen der Workflow-Ausführungen",
+	ErrGhFetchRateLimit:  "Fehler beim Abrufen des GitHub-Ratenlimits",
+	ErrGhInvalidWorkflow: "Ungültige Workflow-ID",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "GitHub-Repository-Collector wird gestartet",
+	MsgGhCollectorTick:             "GitHub-Sammeldurchlauf wird ausgeführt",
+	MsgGhCollectorRepo:             "Daten für Repository werden gesammelt",
+	MsgGhCollectorStopped:          "GitHub-Repository-Collector wurde gestoppt",
+	MsgGhCollectorPassed:           "GitHub-Collector-Selbsttest bestanden",
+	MsgGhCollectorAnnotations:      "Annotationen für fehlgeschlagenen Job gesammelt",
+	MsgGhCollectorLockAcquired:     "Sammelsperre für Repository erworben",
+	MsgGhCollectorLockSkipped:      "Repository übersprungen (eine andere Instanz hält die Sperre)",
+	WarnGhCollectorLockError:       "Verteilte Sperre konnte nicht erworben werden (wird trotzdem fortgesetzt)",
+	ErrGhCollectorFetchRepo:        "Fehler beim Abrufen der Repository-Metadaten",
+	ErrGhCollectorFetchRuns:        "Fehler beim Abrufen der Workflow-Ausführungen",
+	ErrGhCollectorFetchJobs:        "Fehler beim Abrufen der Workflow-Jobs",
+	ErrGhCollectorFetchAnnotations: "Fehler beim Abrufen der Check-Run-Annotationen",
+	ErrGhCollectorNoRepos:          "Keine Repositories zur Überwachung konfiguriert",
+	ErrGhCollectorParseRepo:        "Ungültiges Repository-Format (erwartet: owner/repo)",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "Geben Sie den Code unter der URL ein, um sich zu authentifizieren",
+	MsgAuthPolling:        "Warten auf GitHub-Autorisierung…",
+	MsgAuthSuccess:        "Erfolgreich bei GitHub authentifiziert",
+	MsgAuthLoggedOut:      "GitHub-Anmeldedaten entfernt",
+	MsgAuthStatusLoggedIn: "Bei GitHub angemeldet",
+	MsgAuthStatusNoToken:  "Nicht angemeldet — führen Sie 'scuffinger github auth' aus",
+	MsgAuthTokenFromVault: "Verwende GitHub-Token aus dem System-Tresor",
+	ErrAuthNoClientID:     "github.client_id muss in der Konfiguration für OAuth-Login gesetzt sein",
+	ErrAuthDeviceCode:     "Fehler beim Starten des GitHub-Device-Flows",
+	ErrAuthPoll:           "Fehler beim Abschließen der GitHub-Autorisierung",
+	ErrAuthSaveToken:      "Fehler beim Speichern des Tokens im System-Tresor",
+	ErrAuthVerifyToken:    "Gespeichertes Token ist nicht mehr gültig",
+
+	// CLI commands
+	CmdRootShort:         "Scuffinger — ein leichtgewichtiger GitHub-Überwachungsdienst",
+	CmdRootLong:          "Scuffinger ist ein leichtgewichtiger Dienst zur Überwachung von GitHub-Repositories, Workflows und Metriken. Erstellt mit Cobra, Viper und Gin.",
+	CmdVersionShort:      "Versionsnummer anzeigen",
+	CmdVersionLong:       "Zeigt die aktuelle Version der Scuffinger-Anwendung an, einschließlich Build-Informationen wenn verfügbar.",
+	CmdServeShort:        "HTTP-Server starten",
+	CmdServeLong:         "Startet den Gin-HTTP-Server mit Gesundheitsprüfungen, Prometheus-Metriken und GitHub-API-Endpunkten. Der Server verbindet sich beim Start mit allen konfigurierten Hintergrunddiensten.",
+	CmdGitHubShort:       "GitHub-Authentifizierung und Status",
+	CmdGitHubLong:        "GitHub-OAuth-Authentifizierung verwalten. Verwenden Sie Unterbefehle zum Anmelden via Device-Flow, Überprüfen des Authentifizierungsstatus oder Entfernen gespeicherter Anmeldedaten.",
+	CmdGitHubAuthShort:   "Mit GitHub via OAuth authentifizieren",
+	CmdGitHubAuthLong:    "Startet den GitHub-OAuth-Device-Flow. Sie erhalten einen Einmalcode zur Eingabe unter github.com/login/device. Nach der Autorisierung wird das Token sicher im System-Tresor gespeichert.",
+	CmdGitHubStatusShort: "Aktuellen Authentifizierungsstatus anzeigen",
+	CmdGitHubStatusLong:  "Zeigt den aktuellen GitHub-Authentifizierungsstatus an, einschließlich ob Anmeldedaten in der Konfigurationsdatei, Umgebung oder im System-Tresor gespeichert sind.",
+	CmdGitHubLogoutShort: "Gespeicherte GitHub-Anmeldedaten entfernen",
+	CmdGitHubLogoutLong:  "Entfernt alle im System-Tresor gespeicherten GitHub-OAuth-Tokens. Beeinflusst keine Tokens, die über Konfigurationsdatei oder Umgebungsvariablen konfiguriert sind.",
+	CmdGitHubMonitorShort: "GitHub-Repository-Collector starten",
+	CmdGitHubMonitorLong:  "Startet den Hintergrund-GitHub-Collector, der regelmäßig Repository-Metadaten, Workflow-Ausführungen und Job-Schritt-Zeiten abruft. Stellt Gesundheits- und Prometheus-Metriken-Endpunkte bereit, aber keine API-Proxy-Routen. Konzipiert als separater Prozess neben dem API-Server.",
+	CmdFlagConfig:        "Pfad zur Konfigurationsdatei",
+}

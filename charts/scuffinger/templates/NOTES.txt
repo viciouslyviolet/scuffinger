@@ -1,0 +1,65 @@
+🎉 Scuffinger has been deployed!
+
+{{- if .Values.app.enabled }}
+
+📦 Application:
+{{- if .Values.app.ingress.enabled }}
+  {{- range .Values.app.ingress.hosts }}
+  URL: http{{ if $.Values.app.ingress.tls }}s{{ end }}://{{ .host }}
+  {{- end }}
+{{- else }}
+  kubectl port-forward svc/{{ include "scuffinger.fullname" . }} {{ .Values.app.service.port }}:{{ .Values.app.service.port }} -n {{ .Release.Namespace }}
+  URL: http://localhost:{{ .Values.app.service.port }}
+{{- end }}
+
+  Health:  /health/live, /health/ready
+  Metrics: /metrics
+  Debug:   /api/debug/pg/tables, /api/debug/cache/keys
+{{- end }}
+
+{{- if .Values.collector.enabled }}
+
+🔄 Collector:
+  kubectl port-forward svc/{{ include "scuffinger.fullname" . }}-collector {{ .Values.collector.service.port }}:{{ .Values.collector.service.port }} -n {{ .Release.Namespace }}
+  URL: http://localhost:{{ .Values.collector.service.port }}
+
+  Command: github monitor
+  Health:  /health/live, /health/ready
+  Metrics: /metrics
+{{- end }}
+
+{{- if .Values.grafana.enabled }}
+
+📊 Grafana:
+{{- if .Values.grafana.ingress.enabled }}
+  {{- range .Values.grafana.ingress.hosts }}
+  URL: http{{ if $.Values.grafana.ingress.tls }}s{{ end }}://{{ .host }}
+  {{- end }}
+{{- else }}
+  kubectl port-forward svc/{{ include "scuffinger.fullname" . }}-grafana {{ .Values.grafana.service.port }}:{{ .Values.grafana.service.port }} -n {{ .Release.Namespace }}
+  URL: http://localhost:{{ .Values.grafana.service.port }}
+{{- end }}
+{{- if not .Values.grafana.admin.existingSecret }}
+  User:     {{ .Values.grafana.admin.user }}
+  Password: (stored in secret {{ include "scuffinger.fullname" . }}-grafana)
+{{- end }}
+{{- end }}
+
+{{- if .Values.prometheus.enabled }}
+
+📈 Prometheus:
+  kubectl port-forward svc/{{ include "scuffinger.fullname" . }}-prometheus {{ .Values.prometheus.service.port }}:{{ .Values.prometheus.service.port }} -n {{ .Release.Namespace }}
+  URL: http://localhost:{{ .Values.prometheus.service.port }}
+{{- end }}
+
+ℹ️  For ArgoCD, add this chart as a source in your Application manifest:
+  spec:
+    source:
+      repoURL: <your-repo>
+      path: charts/scuffinger
+      targetRevision: HEAD
+      helm:
+        valueFiles:
+          - values.yaml
+          - values-production.yaml  # optional overlay
+

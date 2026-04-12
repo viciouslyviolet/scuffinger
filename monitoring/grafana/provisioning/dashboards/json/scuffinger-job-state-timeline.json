@@ -1,0 +1,233 @@
+{
+  "uid": "scuffinger-job-state-timeline",
+  "title": "Scuffinger — Workflow Job State Timeline",
+  "tags": ["scuffinger", "github", "workflows", "jobs", "state-timeline"],
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "1m",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "repo",
+        "type": "query",
+        "datasource": { "type": "postgres", "uid": "postgres" },
+        "query": "SELECT DISTINCT repo FROM github_workflow_jobs ORDER BY 1",
+        "definition": "SELECT DISTINCT repo FROM github_workflow_jobs ORDER BY 1",
+        "refresh": 2,
+        "sort": 1,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "workflow",
+        "type": "query",
+        "datasource": { "type": "postgres", "uid": "postgres" },
+        "query": "SELECT DISTINCT data->>'workflow_name' FROM github_workflow_jobs WHERE ('${repo:raw}' = '.*' OR repo IN (${repo:sqlstring})) ORDER BY 1",
+        "definition": "SELECT DISTINCT data->>'workflow_name' FROM github_workflow_jobs",
+        "refresh": 2,
+        "sort": 1,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "run_id",
+        "type": "query",
+        "datasource": { "type": "postgres", "uid": "postgres" },
+        "query": "SELECT DISTINCT run_id::text FROM github_workflow_jobs WHERE ('${repo:raw}' = '.*' OR repo IN (${repo:sqlstring})) AND ('${workflow:raw}' = '.*' OR data->>'workflow_name' IN (${workflow:sqlstring})) ORDER BY 1 DESC LIMIT 200",
+        "definition": "SELECT DISTINCT run_id::text FROM github_workflow_jobs",
+        "refresh": 2,
+        "sort": 2,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "annotations": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Job State Timeline",
+      "description": "Each row is a workflow job. The band spans the job's real start → end time from PostgreSQL. Parallel jobs overlap vertically, sequential jobs appear end-to-end.",
+      "type": "state-timeline",
+      "gridPos": { "h": 16, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "postgres" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 1
+          },
+          "color": { "mode": "fixed" },
+          "mappings": [
+            { "type": "value", "options": {
+              "0":  { "text": "success",     "color": "green"  },
+              "1":  { "text": "failure",     "color": "red"    },
+              "2":  { "text": "in_progress", "color": "yellow" },
+              "3":  { "text": "queued",      "color": "blue"   },
+              "4":  { "text": "skipped",     "color": "purple" },
+              "5":  { "text": "cancelled",   "color": "orange" },
+              "-1": { "text": "unknown",     "color": "text"   }
+            }}
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showValue": "auto",
+        "mergeValues": true,
+        "alignValue": "center",
+        "rowHeight": 0.8,
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "postgres", "uid": "postgres" },
+          "rawSql": "SELECT\n  t.time_point AS \"time\",\n  COALESCE(data->>'workflow_name', 'workflow') || ' / ' || (data->>'name') || '  (#' || j.run_id::text || ')' AS metric,\n  CASE COALESCE(NULLIF(data->>'conclusion', ''), data->>'status', 'unknown')\n    WHEN 'success'     THEN 0\n    WHEN 'failure'     THEN 1\n    WHEN 'in_progress' THEN 2\n    WHEN 'queued'      THEN 3\n    WHEN 'skipped'     THEN 4\n    WHEN 'cancelled'   THEN 5\n    ELSE -1\n  END AS value\nFROM github_workflow_jobs j,\nLATERAL (\n  VALUES\n    ((data->>'started_at')::timestamptz),\n    ((data->>'completed_at')::timestamptz)\n) AS t(time_point)\nWHERE t.time_point IS NOT NULL\n  AND t.time_point BETWEEN $__timeFrom() AND $__timeTo()\n  AND ('${repo:raw}' = '.*' OR j.repo IN (${repo:sqlstring}))\n  AND ('${workflow:raw}' = '.*' OR data->>'workflow_name' IN (${workflow:sqlstring}))\n  AND ('${run_id:raw}' = '.*' OR j.run_id::text IN (${run_id:sqlstring}))\nORDER BY t.time_point",
+          "format": "time_series",
+          "refId": "A"
+        }
+      ],
+      "transformations": []
+    },
+    {
+      "id": 2,
+      "title": "Job Duration Bar Chart",
+      "description": "Duration of each workflow job. Colour thresholds: green < 30 s, yellow < 60 s, orange < 120 s, red ≥ 120 s.",
+      "type": "barchart",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "fillOpacity": 80 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green",  "value": null },
+              { "color": "yellow", "value": 30 },
+              { "color": "orange", "value": 60 },
+              { "color": "red",    "value": 120 }
+            ]
+          },
+          "color": { "mode": "thresholds" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "barWidth": 0.7,
+        "groupWidth": 0.8,
+        "legend": { "displayMode": "list", "placement": "right" },
+        "tooltip": { "mode": "multi" },
+        "xTickLabelRotation": 0
+      },
+      "targets": [
+        {
+          "expr": "scuffinger_github_workflow_job_duration_seconds{repo=~\"$repo\", workflow=~\"$workflow\", run_id=~\"$run_id\"}",
+          "legendFormat": "{{ workflow }} / {{ exported_job }}  (#{{ run_id }})",
+          "refId": "A",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": {
+          "excludeByName": { "Time": true, "__name__": true, "instance": true, "job": true, "exported_job": false, "repo": true, "workflow": true, "run_id": true },
+          "renameByName": { "Value": "Duration (s)" }
+        }},
+        { "id": "sortBy", "options": { "fields": {}, "sort": [{ "field": "Duration (s)", "desc": true }] } }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Latest Job Status per Workflow",
+      "description": "Current conclusion of each job from the most recent scrape.",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "left" }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Status" },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  { "type": "value", "options": {
+                    "0":  { "text": "✅ success",     "color": "green"  },
+                    "1":  { "text": "❌ failure",     "color": "red"    },
+                    "2":  { "text": "🔄 in_progress", "color": "yellow" },
+                    "3":  { "text": "⏳ queued",      "color": "blue"   },
+                    "4":  { "text": "⏭ skipped",     "color": "purple" },
+                    "5":  { "text": "🚫 cancelled",   "color": "orange" },
+                    "-1": { "text": "❓ unknown",     "color": "text"   }
+                  }}
+                ]
+              },
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Duration (s)" },
+            "properties": [
+              { "id": "unit", "value": "s" },
+              { "id": "custom.cellOptions", "value": { "type": "color-background", "mode": "gradient" } },
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [
+                { "color": "green",  "value": null },
+                { "color": "yellow", "value": 30 },
+                { "color": "red",    "value": 120 }
+              ]}}
+            ]
+          }
+        ]
+      },
+      "options": { "showHeader": true, "footer": { "show": false }, "sortBy": [{ "displayName": "Workflow", "desc": false }] },
+      "targets": [
+        {
+          "expr": "scuffinger_github_workflow_job_status{repo=~\"$repo\", workflow=~\"$workflow\", run_id=~\"$run_id\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "expr": "scuffinger_github_workflow_job_duration_seconds{repo=~\"$repo\", workflow=~\"$workflow\", run_id=~\"$run_id\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "B"
+        }
+      ],
+      "transformations": [
+        { "id": "seriesToColumns", "options": { "byField": "exported_job" } },
+        { "id": "organize", "options": {
+          "excludeByName": {
+            "Time 1": true, "Time 2": true,
+            "__name__ 1": true, "__name__ 2": true,
+            "instance 1": true, "instance 2": true,
+            "job 1": true, "job 2": true,
+            "exported_job 2": true,
+            "repo 2": true, "workflow 2": true, "run_id 2": true
+          },
+          "renameByName": {
+            "exported_job": "Job",
+            "repo 1": "Repository",
+            "workflow 1": "Workflow",
+            "run_id 1": "Run ID",
+            "Value 1": "Status",
+            "Value 2": "Duration (s)"
+          }
+        }}
+      ]
+    }
+  ],
+  "schemaVersion": 39
+}

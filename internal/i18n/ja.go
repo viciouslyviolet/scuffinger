@@ -1,0 +1,141 @@
+package i18n
+
+// ── 日本語 (Japanese) ────────────────────────────────────────────────────────
+
+var Ja = Messages{
+	// Config
+	MsgConfigLoaded: "設定を読み込みました",
+	ErrConfigLoad:   "設定の読み込みに失敗しました",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "バックエンドサービスに接続しています",
+	MsgBootstrapSelfTests:   "起動時セルフテストを実行しています",
+	MsgBootstrapTestsPassed: "すべてのセルフテストに合格しました",
+	MsgBootstrapHealthStart: "定期ヘルスチェックを開始しました",
+	ErrBootstrapConnect:     "必要なサービスに接続できません",
+	ErrBootstrapSelfTests:   "起動時セルフテストに失敗しました",
+
+	// Manager
+	MsgManagerConnecting:     "サービスに接続しています",
+	MsgManagerConnected:      "サービスに接続しました",
+	MsgManagerSelfTest:       "セルフテストを実行しています",
+	MsgManagerSelfTestPassed: "セルフテストに合格しました",
+	MsgManagerClosing:        "サービスを停止しています",
+	WarnManagerHealthFailed:  "ヘルスチェックに失敗しました",
+	ErrManagerConnect:        "サービスへの接続に失敗しました",
+	ErrManagerSelfTest:       "サービスのセルフテストに失敗しました",
+	ErrManagerClose:          "サービスの終了中にエラーが発生しました",
+	ErrManagerShutdown:       "シャットダウン中にエラーが発生しました",
+
+	// Cache
+	MsgCacheSelfTestInit:   "現在のタイムスタンプでinitキーを設定しています",
+	MsgCacheSelfTestPassed: "キャッシュのセルフテストに合格しました",
+	ErrCachePing:           "キャッシュに到達できません",
+	ErrCacheSetInit:        "キャッシュへのinitキーの書き込みに失敗しました",
+	ErrCacheGetInit:        "キャッシュからのinitキーの読み取りに失敗しました",
+	ErrCacheInitMismatch:   "キャッシュのinit値が一致しません",
+
+	// Database
+	MsgDbCreatingTestDb:  "一時テストデータベースを作成しています",
+	MsgDbRunningCrud:     "CRUD検証を実行しています",
+	MsgDbSelfTestPassed:  "データベースのセルフテストに合格しました",
+	WarnDbDropTestFailed: "テストデータベースを削除できませんでした（次回起動時に再試行します）",
+	ErrDbConnect:         "データベースに到達できません",
+	ErrDbPing:            "データベースがpingに応答しませんでした",
+	ErrDbCreateTestDb:    "テストデータベースの作成に失敗しました",
+	ErrDbConnectTestDb:   "テストデータベースへの接続に失敗しました",
+	ErrDbCrud:            "データベースのCRUD検証に失敗しました",
+	ErrDbCreateTable:     "テストテーブルの作成に失敗しました",
+	ErrDbInsert:          "テストレコードの挿入に失敗しました",
+	ErrDbRead:            "テストレコードの読み取りに失敗しました",
+	ErrDbReadMismatch:    "テストレコードの値が期待値と一致しません",
+	ErrDbUpdate:          "テストレコードの更新に失敗しました",
+	ErrDbReadAfterUpdate: "更新後のテストレコードの読み取りに失敗しました",
+	ErrDbUpdateMismatch:  "更新されたテストレコードの値が期待値と一致しません",
+
+	// Server
+	MsgServerStarting: "HTTPサーバーを起動しています",
+	MsgServerShutdown: "HTTPサーバーを停止しています",
+	MsgServerStopped:  "HTTPサーバーは正常に停止しました",
+	MsgServerRoutes:   "ルートを登録しました",
+	ErrServerListen:   "HTTPサーバーでエラーが発生しました",
+	ErrServerShutdown: "HTTPサーバーは強制的に停止されました",
+
+	// Health
+	MsgHealthReady:    "すべてのサービスは正常です",
+	MsgHealthNotReady: "1つ以上のサービスが準備できていません",
+
+	// GitHub
+	MsgGhConnecting:      "GitHub APIに接続しています",
+	MsgGhConnected:       "GitHub APIに接続しました",
+	MsgGhAuthToken:       "個人アクセストークンで認証しています",
+	MsgGhAuthApp:         "GitHub Appとして認証しています",
+	MsgGhSelfTestPassed:  "GitHubのセルフテストに合格しました",
+	MsgGhRateRemaining:   "GitHub APIレート制限の状態",
+	WarnGhRateLow:        "GitHub APIのレート制限が残りわずかです",
+	ErrGhNotConfigured:   "GitHubが設定されていません — トークンまたはアプリの認証情報を設定してください",
+	ErrGhAuth:            "GitHub認証に失敗しました",
+	ErrGhReadKey:         "GitHub Appの秘密鍵ファイルの読み取りに失敗しました",
+	ErrGhParseKey:        "GitHub Appの秘密鍵の解析に失敗しました",
+	ErrGhInstallToken:    "GitHub Appのインストールトークンの取得に失敗しました",
+	ErrGhSelfTest:        "GitHubのセルフテストに失敗しました",
+	ErrGhRateLimit:       "GitHub APIのレート制限が低すぎます",
+	ErrGhFetchUser:       "GitHubユーザーの取得に失敗しました",
+	ErrGhFetchOrg:        "GitHub組織の取得に失敗しました",
+	ErrGhFetchRepo:       "GitHubリポジトリの取得に失敗しました",
+	ErrGhFetchBranches:   "リポジトリのブランチの取得に失敗しました",
+	ErrGhFetchWorkflows:  "リポジトリのワークフローの取得に失敗しました",
+	ErrGhFetchRuns:       "ワークフローの実行の取得に失敗しました",
+	ErrGhFetchRateLimit:  "GitHubのレート制限の取得に失敗しました",
+	ErrGhInvalidWorkflow: "無効なワークフローID",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "GitHubリポジトリコレクターを開始しています",
+	MsgGhCollectorTick:             "GitHub収集サイクルを実行しています",
+	MsgGhCollectorRepo:             "リポジトリのデータを収集しています",
+	MsgGhCollectorStopped:          "GitHubリポジトリコレクターが停止しました",
+	MsgGhCollectorPassed:           "GitHubコレクターのセルフテストに合格しました",
+	MsgGhCollectorAnnotations:      "失敗したジョブのアノテーションを収集しました",
+	MsgGhCollectorLockAcquired:     "リポジトリの収集ロックを取得しました",
+	MsgGhCollectorLockSkipped:      "リポジトリをスキップしました（別のインスタンスがロックを保持中）",
+	WarnGhCollectorLockError:       "分散ロックの取得に失敗しました（そのまま続行します）",
+	ErrGhCollectorFetchRepo:        "リポジトリのメタデータの取得に失敗しました",
+	ErrGhCollectorFetchRuns:        "ワークフローの実行の取得に失敗しました",
+	ErrGhCollectorFetchJobs:        "ワークフロージョブの取得に失敗しました",
+	ErrGhCollectorFetchAnnotations: "チェックランのアノテーションの取得に失敗しました",
+	ErrGhCollectorNoRepos:          "監視するリポジトリが設定されていません",
+	ErrGhCollectorParseRepo:        "無効なリポジトリ形式（期待形式: owner/repo）",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "URLでコードを入力して認証してください",
+	MsgAuthPolling:        "GitHubの認可を待機しています…",
+	MsgAuthSuccess:        "GitHubで正常に認証されました",
+	MsgAuthLoggedOut:      "GitHub認証情報を削除しました",
+	MsgAuthStatusLoggedIn: "GitHubにログイン中",
+	MsgAuthStatusNoToken:  "ログインしていません — 'scuffinger github auth'を実行して認証してください",
+	MsgAuthTokenFromVault: "システムボルトからGitHubトークンを使用しています",
+	ErrAuthNoClientID:     "OAuthログインにはgithub.client_idを設定する必要があります",
+	ErrAuthDeviceCode:     "GitHubデバイスフローの開始に失敗しました",
+	ErrAuthPoll:           "GitHub認可の完了に失敗しました",
+	ErrAuthSaveToken:      "システムボルトへのトークンの保存に失敗しました",
+	ErrAuthVerifyToken:    "保存されたトークンは無効になりました",
+
+	// CLI commands
+	CmdRootShort:         "Scuffinger — 軽量なGitHub監視サービス",
+	CmdRootLong:          "Scuffingerは、GitHubリポジトリ、ワークフロー、メトリクスを監視するための軽量サービスです。Cobra、Viper、Ginで構築されています。",
+	CmdVersionShort:      "バージョン番号を表示",
+	CmdVersionLong:       "scuffingerアプリケーションの現在のバージョンを表示します。利用可能な場合はビルド情報も含みます。",
+	CmdServeShort:        "HTTPサーバーを起動",
+	CmdServeLong:         "ヘルスチェック、Prometheusメトリクス、GitHub APIエンドポイントを備えたGin HTTPサーバーを起動します。サーバーは起動時にすべての設定済みバッキングサービスに接続します。",
+	CmdGitHubShort:       "GitHub認証とステータス",
+	CmdGitHubLong:        "GitHub OAuth認証を管理します。サブコマンドを使用して、デバイスフローでログイン、認証ステータスの確認、または保存された認証情報の削除を行います。",
+	CmdGitHubAuthShort:   "OAuthを使用してGitHubで認証",
+	CmdGitHubAuthLong:    "GitHub OAuthデバイスフローを開始します。github.com/login/deviceで入力するワンタイムコードが提供されます。認可後、トークンはシステムボルトに安全に保存されます。",
+	CmdGitHubStatusShort: "現在の認証ステータスを表示",
+	CmdGitHubStatusLong:  "現在のGitHub認証ステータスを表示します。認証情報が設定ファイル、環境変数、またはシステムボルトのどこに保存されているかを含みます。",
+	CmdGitHubLogoutShort: "保存されたGitHub認証情報を削除",
+	CmdGitHubLogoutLong:  "システムボルトに保存されているGitHub OAuthトークンを削除します。設定ファイルまたは環境変数で設定されたトークンには影響しません。",
+	CmdGitHubMonitorShort: "GitHubリポジトリコレクターを起動",
+	CmdGitHubMonitorLong:  "リポジトリのメタデータ、ワークフロー実行、ジョブステップのタイミングを定期的に取得するバックグラウンドGitHubコレクターを起動します。ヘルスチェックとPrometheusメトリクスのエンドポイントを公開しますが、APIプロキシルートは提供しません。APIサーバーとは別のプロセスとして実行するよう設計されています。",
+	CmdFlagConfig:        "設定ファイルへのパス",
+}

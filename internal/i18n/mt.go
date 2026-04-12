@@ -1,0 +1,141 @@
+package i18n
+
+// ── Malti (Maltese) ──────────────────────────────────────────────────────────
+
+var Mt = Messages{
+	// Config
+	MsgConfigLoaded: "Il-konfigurazzjoni ttellgħet",
+	ErrConfigLoad:   "Ma rnexxiex jittagħbel il-konfigurazzjoni",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "Qed jikkonnettja mas-servizzi ta' appoġġ",
+	MsgBootstrapSelfTests:   "Qed jiġu eżegwiti t-testijiet tal-bidu",
+	MsgBootstrapTestsPassed: "It-testijiet tal-bidu kollha għaddew",
+	MsgBootstrapHealthStart: "Il-kontrolli perijodiċi tas-saħħa bdew",
+	ErrBootstrapConnect:     "Ma setax jikkonnettja mas-servizzi meħtieġa",
+	ErrBootstrapSelfTests:   "It-testijiet tal-bidu fallew",
+
+	// Manager
+	MsgManagerConnecting:     "Qed jikkonnettja mas-servizz",
+	MsgManagerConnected:      "Ikkonnettjat mas-servizz",
+	MsgManagerSelfTest:       "Qed jiġi eżegwit it-test awtomatiku",
+	MsgManagerSelfTestPassed: "It-test awtomatiku għadda",
+	MsgManagerClosing:        "Qed jingħalqu s-servizzi",
+	WarnManagerHealthFailed:  "Il-kontroll tas-saħħa falla",
+	ErrManagerConnect:        "Ma rnexxiex jikkonnettja mas-servizz",
+	ErrManagerSelfTest:       "It-test awtomatiku falla għas-servizz",
+	ErrManagerClose:          "Żball meta ngħalaq is-servizz",
+	ErrManagerShutdown:       "Seħħew żbalji waqt it-tifi",
+
+	// Cache
+	MsgCacheSelfTestInit:   "Qed jiġi stabbilit iċ-ċavetta init bil-ħin attwali",
+	MsgCacheSelfTestPassed: "It-test awtomatiku tal-cache għadda",
+	ErrCachePing:           "Il-cache mhux aċċessibbli",
+	ErrCacheSetInit:        "Ma rnexxiex jinkiteb iċ-ċavetta init fil-cache",
+	ErrCacheGetInit:        "Ma rnexxiex jinqara ċ-ċavetta init mill-cache",
+	ErrCacheInitMismatch:   "Il-valur init tal-cache ma jaqbilx",
+
+	// Database
+	MsgDbCreatingTestDb:  "Qed tinħoloq id-database tat-test temporanja",
+	MsgDbRunningCrud:     "Qed tiġi eżegwita l-verifika CRUD",
+	MsgDbSelfTestPassed:  "It-test awtomatiku tad-database għadda",
+	WarnDbDropTestFailed: "Ma setax jitneħħa d-database tat-test (se jerġa jipprova fil-bidu li jmiss)",
+	ErrDbConnect:         "Id-database mhix aċċessibbli",
+	ErrDbPing:            "Id-database ma weġbitx għall-ping",
+	ErrDbCreateTestDb:    "Ma rnexxiex tinħoloq id-database tat-test",
+	ErrDbConnectTestDb:   "Ma rnexxiex jikkonnettja mad-database tat-test",
+	ErrDbCrud:            "Il-verifika CRUD tad-database falliet",
+	ErrDbCreateTable:     "Ma rnexxiex tinħoloq it-tabella tat-test",
+	ErrDbInsert:          "Ma rnexxiex jiddaħħal ir-rekord tat-test",
+	ErrDbRead:            "Ma rnexxiex jinqara r-rekord tat-test",
+	ErrDbReadMismatch:    "Il-valur tar-rekord tat-test ma jaqbilx mal-mistenni",
+	ErrDbUpdate:          "Ma rnexxiex jiġi aġġornat ir-rekord tat-test",
+	ErrDbReadAfterUpdate: "Ma rnexxiex jinqara r-rekord tat-test wara l-aġġornament",
+	ErrDbUpdateMismatch:  "Il-valur tar-rekord aġġornat ma jaqbilx mal-mistenni",
+
+	// Server
+	MsgServerStarting: "Is-server HTTP qed jibda",
+	MsgServerShutdown: "Qed jintefa s-server HTTP",
+	MsgServerStopped:  "Is-server HTTP waqaf b'mod korrett",
+	MsgServerRoutes:   "Ir-rotot ġew irreġistrati",
+	ErrServerListen:   "Is-server HTTPiltaqa' ma' żball",
+	ErrServerShutdown: "Is-server HTTP ġie sfurzat jintefa",
+
+	// Health
+	MsgHealthReady:    "Is-servizzi kollha f'saħħithom",
+	MsgHealthNotReady: "Servizz wieħed jew aktar mhumiex lesti",
+
+	// GitHub
+	MsgGhConnecting:      "Qed jikkonnettja mal-API ta' GitHub",
+	MsgGhConnected:       "Ikkonnettjat mal-API ta' GitHub",
+	MsgGhAuthToken:       "Qed jawtentika b'token ta' aċċess personali",
+	MsgGhAuthApp:         "Qed jawtentika bħala applikazzjoni GitHub",
+	MsgGhSelfTestPassed:  "It-test awtomatiku ta' GitHub għadda",
+	MsgGhRateRemaining:   "Stat tal-limitu tar-rata tal-API ta' GitHub",
+	WarnGhRateLow:        "Il-limitu tar-rata tal-API ta' GitHub qed jonqos",
+	ErrGhNotConfigured:   "GitHub mhux ikkonfigurat — issettja token jew kredenzjali tal-applikazzjoni",
+	ErrGhAuth:            "L-awtentikazzjoni ta' GitHub falliet",
+	ErrGhReadKey:         "Ma rnexxiex jinqara l-fajl taċ-ċavetta privata tal-applikazzjoni GitHub",
+	ErrGhParseKey:        "Ma rnexxiex tiġi analizzata ċ-ċavetta privata tal-applikazzjoni GitHub",
+	ErrGhInstallToken:    "Ma rnexxiex jinkiseb it-token tal-installazzjoni tal-applikazzjoni GitHub",
+	ErrGhSelfTest:        "It-test awtomatiku ta' GitHub falla",
+	ErrGhRateLimit:       "Il-limitu tar-rata tal-API ta' GitHub baxx wisq",
+	ErrGhFetchUser:       "Ma rnexxiex jinkiseb l-utent ta' GitHub",
+	ErrGhFetchOrg:        "Ma rnexxiex tinkiseb l-organizzazzjoni ta' GitHub",
+	ErrGhFetchRepo:       "Ma rnexxiex jinkiseb ir-repożitorju ta' GitHub",
+	ErrGhFetchBranches:   "Ma rnexxiex jinkisbu l-fergħat tar-repożitorju",
+	ErrGhFetchWorkflows:  "Ma rnexxiex jinkisbu l-workflows tar-repożitorju",
+	ErrGhFetchRuns:       "Ma rnexxiex jinkisbu l-eżekuzzjonijiet tal-workflow",
+	ErrGhFetchRateLimit:  "Ma rnexxiex jinkiseb il-limitu tar-rata ta' GitHub",
+	ErrGhInvalidWorkflow: "ID tal-workflow mhux validu",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "Il-kollezzjonist tar-repożitorji ta' GitHub qed jibda",
+	MsgGhCollectorTick:             "Qed tiġi eżegwita ċ-ċiklu tal-ġbir ta' GitHub",
+	MsgGhCollectorRepo:             "Qed jinġabar id-dejta tar-repożitorju",
+	MsgGhCollectorStopped:          "Il-kollezzjonist tar-repożitorji ta' GitHub waqaf",
+	MsgGhCollectorPassed:           "It-test awtomatiku tal-kollezzjonist ta' GitHub għadda",
+	MsgGhCollectorAnnotations:      "Annotazzjonijiet miġbura għall-impjieg li falla",
+	MsgGhCollectorLockAcquired:     "Lock tal-ġbir miksub għar-repożitorju",
+	MsgGhCollectorLockSkipped:      "Repożitorju maqbuż (istanza oħra qed iżżomm il-lock)",
+	WarnGhCollectorLockError:       "Ma rnexxiex jinkiseb il-lock distribwit (qed jitkompla xorta waħda)",
+	ErrGhCollectorFetchRepo:        "Ma rnexxiex jinkiseb il-metadata tar-repożitorju",
+	ErrGhCollectorFetchRuns:        "Ma rnexxiex jinkisbu l-eżekuzzjonijiet tal-workflow",
+	ErrGhCollectorFetchJobs:        "Ma rnexxiex jinkisbu l-impjiegi tal-workflow",
+	ErrGhCollectorFetchAnnotations: "Ma rnexxiex jinkisbu l-annotazzjonijiet tal-check-run",
+	ErrGhCollectorNoRepos:          "L-ebda repożitorji kkonfigurati għall-monitoraġġ",
+	ErrGhCollectorParseRepo:        "Format tar-repożitorju mhux validu (mistenni: sid/repo)",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "Daħħal il-kodiċi fl-URL biex tawtentika",
+	MsgAuthPolling:        "Qed jistenna l-awtorizzazzjoni ta' GitHub…",
+	MsgAuthSuccess:        "Awtentikazzjoni ma' GitHub irnexxiet",
+	MsgAuthLoggedOut:      "Il-kredenzjali ta' GitHub tneħħew",
+	MsgAuthStatusLoggedIn: "Idħol f'GitHub",
+	MsgAuthStatusNoToken:  "Mhux idħol — eżegwi 'scuffinger github auth' biex tawtentika",
+	MsgAuthTokenFromVault: "Qed jintuża t-token ta' GitHub mill-vault tas-sistema",
+	ErrAuthNoClientID:     "github.client_id irid ikun issettjat fil-konfigurazzjoni għal-login OAuth",
+	ErrAuthDeviceCode:     "Ma rnexxiex jibda l-fluss tal-apparat ta' GitHub",
+	ErrAuthPoll:           "Ma rnexxiex titlesta l-awtorizzazzjoni ta' GitHub",
+	ErrAuthSaveToken:      "Ma rnexxiex jiġi ssejvjat it-token fil-vault tas-sistema",
+	ErrAuthVerifyToken:    "It-token issejvjat m'għadux validu",
+
+	// CLI commands
+	CmdRootShort:         "Scuffinger — servizz ħafif ta' monitoraġġ ta' GitHub",
+	CmdRootLong:          "Scuffinger huwa servizz ħafif għall-monitoraġġ ta' repożitorji, workflows u metriċi ta' GitHub. Mibni b'Cobra, Viper u Gin.",
+	CmdVersionShort:      "Uri n-numru tal-verżjoni",
+	CmdVersionLong:       "Juri l-verżjoni attwali tal-applikazzjoni scuffinger, inkluża l-informazzjoni tal-bini meta disponibbli.",
+	CmdServeShort:        "Ibda s-server HTTP",
+	CmdServeLong:         "Jibda s-server HTTP Gin bil-kontrolli tas-saħħa, metriċi Prometheus u endpoints tal-API ta' GitHub. Is-server jikkonnettja mas-servizzi kollha kkonfigurati mal-bidu.",
+	CmdGitHubShort:       "Awtentikazzjoni u stat ta' GitHub",
+	CmdGitHubLong:        "Immaniġġja l-awtentikazzjoni OAuth ta' GitHub. Uża sottokumandi biex tidħol permezz tal-fluss tal-apparat, tiċċekkja l-istat tal-awtentikazzjoni jew tneħħi kredenzjali ssejvjati.",
+	CmdGitHubAuthShort:   "Awtentika ma' GitHub permezz ta' OAuth",
+	CmdGitHubAuthLong:    "Jibda l-fluss tal-apparat OAuth ta' GitHub. Se tirċievi kodiċi ta' darba biex tiddaħħal f'github.com/login/device. Wara l-awtorizzazzjoni, it-token jiġi ssejvjat b'mod sigur fil-vault tas-sistema.",
+	CmdGitHubStatusShort: "Uri l-istat attwali tal-awtentikazzjoni",
+	CmdGitHubStatusLong:  "Juri l-istat attwali tal-awtentikazzjoni ta' GitHub, inkluż jekk il-kredenzjali huma ssejvjati fil-fajl tal-konfigurazzjoni, varjabbli ambjentali jew vault tas-sistema.",
+	CmdGitHubLogoutShort: "Neħħi l-kredenzjali ssejvjati ta' GitHub",
+	CmdGitHubLogoutLong:  "Ineħħi kwalunkwe tokens OAuth ta' GitHub ssejvjati fil-vault tas-sistema. Ma jaffettwax tokens ikkonfigurati permezz tal-fajl tal-konfigurazzjoni jew varjabbli ambjentali.",
+	CmdGitHubMonitorShort: "Ibda l-kollettatur tar-repożitorji ta' GitHub",
+	CmdGitHubMonitorLong:  "Jibda l-kollettatur ta' GitHub fil-background li jiġbor perjodikament metadata tar-repożitorji, eżekuzzjonijiet ta' workflows u ħinijiet tal-passi tal-jobs. Jesponi endpoints tas-saħħa u metriċi Prometheus iżda l-ebda rotot proxy tal-API. Iddisinjat biex jaħdem bħala proċess separat maġenb is-server tal-API.",
+	CmdFlagConfig:        "Mogħdija għall-fajl tal-konfigurazzjoni",
+}

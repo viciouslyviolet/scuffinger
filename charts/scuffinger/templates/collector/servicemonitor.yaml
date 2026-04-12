@@ -1,0 +1,36 @@
+{{- if and .Values.collector.enabled .Values.collector.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-collector
+  namespace: {{ .Values.collector.serviceMonitor.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "collector") | nindent 4 }}
+    {{- with .Values.collector.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "scuffinger.componentSelectorLabels" (list . "collector") | nindent 6 }}
+  endpoints:
+    - port: http
+      path: {{ .Values.collector.serviceMonitor.path }}
+      interval: {{ .Values.collector.serviceMonitor.interval }}
+      scrapeTimeout: {{ .Values.collector.serviceMonitor.scrapeTimeout }}
+      honorLabels: {{ .Values.collector.serviceMonitor.honorLabels }}
+      {{- with .Values.collector.serviceMonitor.metricRelabelings }}
+      metricRelabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.collector.serviceMonitor.relabelings }}
+      relabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+{{- end }}
+

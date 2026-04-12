@@ -1,0 +1,49 @@
+{{- if .Values.app.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "scuffinger.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "scuffinger.componentLabels" (list . "app") | nindent 4 }}
+  annotations:
+    {{- include "scuffinger.annotations" . | nindent 4 }}
+data:
+  config.yaml: |
+    server:
+      host: {{ .Values.app.config.server.host | quote }}
+      port: {{ .Values.app.config.server.port }}
+    log:
+      level: {{ .Values.app.config.log.level | quote }}
+      format: {{ .Values.app.config.log.format | quote }}
+    app:
+      name: {{ .Values.app.config.app.name | quote }}
+      version: {{ .Values.app.config.app.version | default .Chart.AppVersion | quote }}
+    database:
+      host: {{ include "scuffinger.postgresql.host" . | quote }}
+      port: {{ .Values.postgresql.service.port }}
+      user: {{ .Values.postgresql.auth.username | quote }}
+      password: {{ .Values.postgresql.auth.password | quote }}
+      name: {{ .Values.postgresql.auth.database | quote }}
+      sslmode: "disable"
+    cache:
+      host: {{ include "scuffinger.valkey.host" . | quote }}
+      port: {{ .Values.valkey.service.port }}
+      github_cache_ttl: {{ .Values.app.config.cache.githubCacheTtl | quote }}
+    github:
+      token: {{ .Values.app.config.github.token | quote }}
+      client_id: {{ .Values.app.config.github.clientId | quote }}
+      app_id: {{ .Values.app.config.github.appId }}
+      installation_id: {{ .Values.app.config.github.installationId }}
+      private_key_path: {{ .Values.app.config.github.privateKeyPath | quote }}
+      organization: {{ .Values.app.config.github.organization | quote }}
+      rate_limit_threshold: {{ .Values.app.config.github.rateLimitThreshold }}
+      collector_interval: {{ .Values.app.config.github.collectorInterval | quote }}
+      max_recent_runs: {{ .Values.app.config.github.maxRecentRuns }}
+      fetch_annotations: {{ .Values.app.config.github.fetchAnnotations }}
+      repositories:
+      {{- range .Values.app.config.github.repositories }}
+        - {{ . | quote }}
+      {{- end }}
+{{- end }}
+

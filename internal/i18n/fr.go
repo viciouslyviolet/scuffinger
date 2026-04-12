@@ -1,0 +1,141 @@
+package i18n
+
+// ── Français ─────────────────────────────────────────────────────────────────
+
+var Fr = Messages{
+	// Config
+	MsgConfigLoaded: "Configuration chargée",
+	ErrConfigLoad:   "Échec du chargement de la configuration",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "Connexion aux services de support",
+	MsgBootstrapSelfTests:   "Exécution des autotests de démarrage",
+	MsgBootstrapTestsPassed: "Tous les autotests ont réussi",
+	MsgBootstrapHealthStart: "Vérifications périodiques de santé démarrées",
+	ErrBootstrapConnect:     "Impossible de se connecter aux services requis",
+	ErrBootstrapSelfTests:   "Les autotests de démarrage ont échoué",
+
+	// Manager
+	MsgManagerConnecting:     "Connexion au service",
+	MsgManagerConnected:      "Connecté au service",
+	MsgManagerSelfTest:       "Exécution de l'autotest",
+	MsgManagerSelfTestPassed: "Autotest réussi",
+	MsgManagerClosing:        "Arrêt des services",
+	WarnManagerHealthFailed:  "La vérification de santé a échoué",
+	ErrManagerConnect:        "Échec de la connexion au service",
+	ErrManagerSelfTest:       "L'autotest a échoué pour le service",
+	ErrManagerClose:          "Erreur lors de la fermeture du service",
+	ErrManagerShutdown:       "Des erreurs se sont produites lors de l'arrêt",
+
+	// Cache
+	MsgCacheSelfTestInit:   "Définition de la clé init avec l'horodatage actuel",
+	MsgCacheSelfTestPassed: "Autotest du cache réussi",
+	ErrCachePing:           "Le cache n'est pas accessible",
+	ErrCacheSetInit:        "Échec de l'écriture de la clé init dans le cache",
+	ErrCacheGetInit:        "Échec de la lecture de la clé init du cache",
+	ErrCacheInitMismatch:   "La valeur init du cache ne correspond pas",
+
+	// Database
+	MsgDbCreatingTestDb:  "Création de la base de données de test temporaire",
+	MsgDbRunningCrud:     "Exécution de la vérification CRUD",
+	MsgDbSelfTestPassed:  "Autotest de la base de données réussi",
+	WarnDbDropTestFailed: "Impossible de supprimer la base de données de test (nouvel essai au prochain démarrage)",
+	ErrDbConnect:         "La base de données n'est pas accessible",
+	ErrDbPing:            "La base de données n'a pas répondu au ping",
+	ErrDbCreateTestDb:    "Échec de la création de la base de données de test",
+	ErrDbConnectTestDb:   "Échec de la connexion à la base de données de test",
+	ErrDbCrud:            "La vérification CRUD de la base de données a échoué",
+	ErrDbCreateTable:     "Échec de la création de la table de test",
+	ErrDbInsert:          "Échec de l'insertion de l'enregistrement de test",
+	ErrDbRead:            "Échec de la lecture de l'enregistrement de test",
+	ErrDbReadMismatch:    "La valeur de l'enregistrement de test ne correspond pas à la valeur attendue",
+	ErrDbUpdate:          "Échec de la mise à jour de l'enregistrement de test",
+	ErrDbReadAfterUpdate: "Échec de la lecture de l'enregistrement de test après la mise à jour",
+	ErrDbUpdateMismatch:  "La valeur de l'enregistrement mis à jour ne correspond pas à la valeur attendue",
+
+	// Server
+	MsgServerStarting: "Démarrage du serveur HTTP",
+	MsgServerShutdown: "Arrêt du serveur HTTP",
+	MsgServerStopped:  "Le serveur HTTP s'est arrêté correctement",
+	MsgServerRoutes:   "Routes enregistrées",
+	ErrServerListen:   "Le serveur HTTP a rencontré une erreur",
+	ErrServerShutdown: "Le serveur HTTP a été forcé de s'arrêter",
+
+	// Health
+	MsgHealthReady:    "Tous les services sont opérationnels",
+	MsgHealthNotReady: "Un ou plusieurs services ne sont pas prêts",
+
+	// GitHub
+	MsgGhConnecting:      "Connexion à l'API GitHub",
+	MsgGhConnected:       "Connecté à l'API GitHub",
+	MsgGhAuthToken:       "Authentification avec un jeton d'accès personnel",
+	MsgGhAuthApp:         "Authentification en tant qu'application GitHub",
+	MsgGhSelfTestPassed:  "Autotest GitHub réussi",
+	MsgGhRateRemaining:   "État de la limite de débit de l'API GitHub",
+	WarnGhRateLow:        "La limite de débit de l'API GitHub est basse",
+	ErrGhNotConfigured:   "GitHub n'est pas configuré — définissez un jeton ou des identifiants d'application",
+	ErrGhAuth:            "L'authentification GitHub a échoué",
+	ErrGhReadKey:         "Échec de la lecture du fichier de clé privée de l'application GitHub",
+	ErrGhParseKey:        "Échec de l'analyse de la clé privée de l'application GitHub",
+	ErrGhInstallToken:    "Échec de l'obtention du jeton d'installation de l'application GitHub",
+	ErrGhSelfTest:        "L'autotest GitHub a échoué",
+	ErrGhRateLimit:       "Limite de débit de l'API GitHub trop basse",
+	ErrGhFetchUser:       "Échec de la récupération de l'utilisateur GitHub",
+	ErrGhFetchOrg:        "Échec de la récupération de l'organisation GitHub",
+	ErrGhFetchRepo:       "Échec de la récupération du dépôt GitHub",
+	ErrGhFetchBranches:   "Échec de la récupération des branches du dépôt",
+	ErrGhFetchWorkflows:  "Échec de la récupération des flux de travail du dépôt",
+	ErrGhFetchRuns:       "Échec de la récupération des exécutions du flux de travail",
+	ErrGhFetchRateLimit:  "Échec de la récupération de la limite de débit GitHub",
+	ErrGhInvalidWorkflow: "ID de flux de travail non valide",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "Démarrage du collecteur de dépôts GitHub",
+	MsgGhCollectorTick:             "Exécution du cycle de collecte GitHub",
+	MsgGhCollectorRepo:             "Collecte des données du dépôt",
+	MsgGhCollectorStopped:          "Collecteur de dépôts GitHub arrêté",
+	MsgGhCollectorPassed:           "Autotest du collecteur GitHub réussi",
+	MsgGhCollectorAnnotations:      "Annotations collectées pour le travail échoué",
+	MsgGhCollectorLockAcquired:     "Verrou de collecte acquis pour le dépôt",
+	MsgGhCollectorLockSkipped:      "Dépôt ignoré (une autre instance détient le verrou)",
+	WarnGhCollectorLockError:       "Échec de l'acquisition du verrou distribué (poursuite malgré tout)",
+	ErrGhCollectorFetchRepo:        "Échec de la récupération des métadonnées du dépôt",
+	ErrGhCollectorFetchRuns:        "Échec de la récupération des exécutions du flux de travail",
+	ErrGhCollectorFetchJobs:        "Échec de la récupération des tâches du flux de travail",
+	ErrGhCollectorFetchAnnotations: "Échec de la récupération des annotations du check-run",
+	ErrGhCollectorNoRepos:          "Aucun dépôt configuré pour la surveillance",
+	ErrGhCollectorParseRepo:        "Format de dépôt invalide (attendu: propriétaire/dépôt)",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "Entrez le code à l'URL pour vous authentifier",
+	MsgAuthPolling:        "En attente de l'autorisation GitHub…",
+	MsgAuthSuccess:        "Authentification GitHub réussie",
+	MsgAuthLoggedOut:      "Identifiants GitHub supprimés",
+	MsgAuthStatusLoggedIn: "Connecté à GitHub",
+	MsgAuthStatusNoToken:  "Non connecté — exécutez 'scuffinger github auth' pour vous authentifier",
+	MsgAuthTokenFromVault: "Utilisation du jeton GitHub depuis le coffre-fort système",
+	ErrAuthNoClientID:     "github.client_id doit être défini dans la configuration pour la connexion OAuth",
+	ErrAuthDeviceCode:     "Échec de l'initiation du flux d'appareil GitHub",
+	ErrAuthPoll:           "Échec de l'achèvement de l'autorisation GitHub",
+	ErrAuthSaveToken:      "Échec de l'enregistrement du jeton dans le coffre-fort système",
+	ErrAuthVerifyToken:    "Le jeton stocké n'est plus valide",
+
+	// CLI commands
+	CmdRootShort:         "Scuffinger — un service léger de surveillance GitHub",
+	CmdRootLong:          "Scuffinger est un service léger pour surveiller les dépôts, flux de travail et métriques GitHub. Construit avec Cobra, Viper et Gin.",
+	CmdVersionShort:      "Afficher le numéro de version",
+	CmdVersionLong:       "Affiche la version actuelle de l'application scuffinger, y compris les informations de build si disponibles.",
+	CmdServeShort:        "Démarrer le serveur HTTP",
+	CmdServeLong:         "Démarre le serveur HTTP Gin avec les vérifications de santé, les métriques Prometheus et les points de terminaison de l'API GitHub. Le serveur se connecte à tous les services de support configurés au démarrage.",
+	CmdGitHubShort:       "Authentification et état GitHub",
+	CmdGitHubLong:        "Gérer l'authentification OAuth GitHub. Utilisez les sous-commandes pour vous connecter via le flux d'appareil, vérifier l'état d'authentification ou supprimer les identifiants stockés.",
+	CmdGitHubAuthShort:   "S'authentifier avec GitHub via OAuth",
+	CmdGitHubAuthLong:    "Démarre le flux d'appareil OAuth GitHub. Vous recevrez un code unique à entrer sur github.com/login/device. Une fois autorisé, le jeton est stocké de manière sécurisée dans le coffre-fort système.",
+	CmdGitHubStatusShort: "Afficher l'état d'authentification actuel",
+	CmdGitHubStatusLong:  "Affiche l'état actuel de l'authentification GitHub, y compris si les identifiants sont stockés dans le fichier de configuration, les variables d'environnement ou le coffre-fort système.",
+	CmdGitHubLogoutShort: "Supprimer les identifiants GitHub stockés",
+	CmdGitHubLogoutLong:  "Supprime tous les jetons OAuth GitHub stockés dans le coffre-fort système. N'affecte pas les jetons configurés via le fichier de configuration ou les variables d'environnement.",
+	CmdGitHubMonitorShort: "Démarrer le collecteur de dépôts GitHub",
+	CmdGitHubMonitorLong:  "Démarre le collecteur GitHub en arrière-plan qui récupère périodiquement les métadonnées des dépôts, les exécutions de workflows et les chronométrages des étapes de jobs. Expose les points de terminaison de santé et de métriques Prometheus, mais pas de routes proxy API. Conçu pour s'exécuter comme un processus séparé à côté du serveur API.",
+	CmdFlagConfig:        "Chemin vers le fichier de configuration",
+}

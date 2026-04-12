@@ -1,0 +1,141 @@
+package i18n
+
+// ── 中文 (Chinese Simplified) ────────────────────────────────────────────────
+
+var Zh = Messages{
+	// Config
+	MsgConfigLoaded: "配置已加载",
+	ErrConfigLoad:   "加载配置失败",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "正在连接后端服务",
+	MsgBootstrapSelfTests:   "正在运行启动自检",
+	MsgBootstrapTestsPassed: "所有自检均已通过",
+	MsgBootstrapHealthStart: "已启动定期健康检查",
+	ErrBootstrapConnect:     "无法连接到所需服务",
+	ErrBootstrapSelfTests:   "启动自检失败",
+
+	// Manager
+	MsgManagerConnecting:     "正在连接服务",
+	MsgManagerConnected:      "已连接到服务",
+	MsgManagerSelfTest:       "正在运行自检",
+	MsgManagerSelfTestPassed: "自检通过",
+	MsgManagerClosing:        "正在关闭服务",
+	WarnManagerHealthFailed:  "健康检查失败",
+	ErrManagerConnect:        "连接服务失败",
+	ErrManagerSelfTest:       "服务自检失败",
+	ErrManagerClose:          "关闭服务时出错",
+	ErrManagerShutdown:       "关闭过程中发生错误",
+
+	// Cache
+	MsgCacheSelfTestInit:   "正在使用当前时间戳设置init键",
+	MsgCacheSelfTestPassed: "缓存自检通过",
+	ErrCachePing:           "缓存不可达",
+	ErrCacheSetInit:        "向缓存写入init键失败",
+	ErrCacheGetInit:        "从缓存读取init键失败",
+	ErrCacheInitMismatch:   "缓存init值不匹配",
+
+	// Database
+	MsgDbCreatingTestDb:  "正在创建临时测试数据库",
+	MsgDbRunningCrud:     "正在运行CRUD验证",
+	MsgDbSelfTestPassed:  "数据库自检通过",
+	WarnDbDropTestFailed: "无法删除测试数据库（将在下次启动时重试）",
+	ErrDbConnect:         "数据库不可达",
+	ErrDbPing:            "数据库未响应ping",
+	ErrDbCreateTestDb:    "创建测试数据库失败",
+	ErrDbConnectTestDb:   "连接测试数据库失败",
+	ErrDbCrud:            "数据库CRUD验证失败",
+	ErrDbCreateTable:     "创建测试表失败",
+	ErrDbInsert:          "插入测试记录失败",
+	ErrDbRead:            "读取测试记录失败",
+	ErrDbReadMismatch:    "测试记录的值与预期不符",
+	ErrDbUpdate:          "更新测试记录失败",
+	ErrDbReadAfterUpdate: "更新后读取测试记录失败",
+	ErrDbUpdateMismatch:  "更新后的测试记录值与预期不符",
+
+	// Server
+	MsgServerStarting: "HTTP服务器正在启动",
+	MsgServerShutdown: "正在关闭HTTP服务器",
+	MsgServerStopped:  "HTTP服务器已正常停止",
+	MsgServerRoutes:   "路由已注册",
+	ErrServerListen:   "HTTP服务器遇到错误",
+	ErrServerShutdown: "HTTP服务器被强制关闭",
+
+	// Health
+	MsgHealthReady:    "所有服务运行正常",
+	MsgHealthNotReady: "一个或多个服务未就绪",
+
+	// GitHub
+	MsgGhConnecting:      "正在连接GitHub API",
+	MsgGhConnected:       "已连接到GitHub API",
+	MsgGhAuthToken:       "正在使用个人访问令牌进行身份验证",
+	MsgGhAuthApp:         "正在以GitHub App身份进行身份验证",
+	MsgGhSelfTestPassed:  "GitHub自检通过",
+	MsgGhRateRemaining:   "GitHub API速率限制状态",
+	WarnGhRateLow:        "GitHub API速率限制即将耗尽",
+	ErrGhNotConfigured:   "GitHub未配置 — 请设置令牌或应用凭据",
+	ErrGhAuth:            "GitHub身份验证失败",
+	ErrGhReadKey:         "读取GitHub App私钥文件失败",
+	ErrGhParseKey:        "解析GitHub App私钥失败",
+	ErrGhInstallToken:    "获取GitHub App安装令牌失败",
+	ErrGhSelfTest:        "GitHub自检失败",
+	ErrGhRateLimit:       "GitHub API速率限制过低",
+	ErrGhFetchUser:       "获取GitHub用户失败",
+	ErrGhFetchOrg:        "获取GitHub组织失败",
+	ErrGhFetchRepo:       "获取GitHub仓库失败",
+	ErrGhFetchBranches:   "获取仓库分支失败",
+	ErrGhFetchWorkflows:  "获取仓库工作流失败",
+	ErrGhFetchRuns:       "获取工作流运行记录失败",
+	ErrGhFetchRateLimit:  "获取GitHub速率限制失败",
+	ErrGhInvalidWorkflow: "无效的工作流ID",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "正在启动GitHub仓库收集器",
+	MsgGhCollectorTick:             "正在执行GitHub收集周期",
+	MsgGhCollectorRepo:             "正在收集仓库数据",
+	MsgGhCollectorStopped:          "GitHub仓库收集器已停止",
+	MsgGhCollectorPassed:           "GitHub收集器自检通过",
+	MsgGhCollectorAnnotations:      "已收集失败任务的注释",
+	MsgGhCollectorLockAcquired:     "已获取仓库的收集锁",
+	MsgGhCollectorLockSkipped:      "跳过仓库（另一个实例持有锁）",
+	WarnGhCollectorLockError:       "获取分布式锁失败（仍继续执行）",
+	ErrGhCollectorFetchRepo:        "获取仓库元数据失败",
+	ErrGhCollectorFetchRuns:        "获取工作流运行失败",
+	ErrGhCollectorFetchJobs:        "获取工作流任务失败",
+	ErrGhCollectorFetchAnnotations: "获取检查运行注释失败",
+	ErrGhCollectorNoRepos:          "没有配置需要监控的仓库",
+	ErrGhCollectorParseRepo:        "无效的仓库格式（期望格式: owner/repo）",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "在URL中输入代码以进行身份验证",
+	MsgAuthPolling:        "正在等待GitHub授权…",
+	MsgAuthSuccess:        "GitHub身份验证成功",
+	MsgAuthLoggedOut:      "GitHub凭据已删除",
+	MsgAuthStatusLoggedIn: "已登录GitHub",
+	MsgAuthStatusNoToken:  "未登录 — 运行 'scuffinger github auth' 进行身份验证",
+	MsgAuthTokenFromVault: "正在使用系统保险库中的GitHub令牌",
+	ErrAuthNoClientID:     "OAuth登录需要设置github.client_id",
+	ErrAuthDeviceCode:     "启动GitHub设备流程失败",
+	ErrAuthPoll:           "完成GitHub授权失败",
+	ErrAuthSaveToken:      "保存令牌到系统保险库失败",
+	ErrAuthVerifyToken:    "存储的令牌已失效",
+
+	// CLI commands
+	CmdRootShort:         "Scuffinger — 轻量级GitHub监控服务",
+	CmdRootLong:          "Scuffinger是一个用于监控GitHub仓库、工作流和指标的轻量级服务。使用Cobra、Viper和Gin构建。",
+	CmdVersionShort:      "显示版本号",
+	CmdVersionLong:       "显示scuffinger应用程序的当前版本，包括可用的构建信息。",
+	CmdServeShort:        "启动HTTP服务器",
+	CmdServeLong:         "启动带有健康检查、Prometheus指标和GitHub API端点的Gin HTTP服务器。服务器在启动时连接到所有配置的后端服务。",
+	CmdGitHubShort:       "GitHub身份验证和状态",
+	CmdGitHubLong:        "管理GitHub OAuth身份验证。使用子命令通过设备流程登录、检查身份验证状态或删除存储的凭据。",
+	CmdGitHubAuthShort:   "使用OAuth进行GitHub身份验证",
+	CmdGitHubAuthLong:    "启动GitHub OAuth设备流程。您将获得一个一次性代码，在github.com/login/device输入。授权后，令牌将安全存储在系统保险库中。",
+	CmdGitHubStatusShort: "显示当前身份验证状态",
+	CmdGitHubStatusLong:  "显示当前GitHub身份验证状态，包括凭据是存储在配置文件、环境变量还是系统保险库中。",
+	CmdGitHubLogoutShort: "删除存储的GitHub凭据",
+	CmdGitHubLogoutLong:  "删除存储在系统保险库中的所有GitHub OAuth令牌。不影响通过配置文件或环境变量配置的令牌。",
+	CmdGitHubMonitorShort: "启动GitHub仓库收集器",
+	CmdGitHubMonitorLong:  "启动后台GitHub收集器，定期获取仓库元数据、工作流运行记录和任务步骤耗时。提供健康检查和Prometheus指标端点，但不提供API代理路由。设计为与API服务器分开运行的独立进程。",
+	CmdFlagConfig:        "配置文件路径",
+}

@@ -1,0 +1,141 @@
+package i18n
+
+// ── Norsk bokmål (Norwegian) ─────────────────────────────────────────────────
+
+var No = Messages{
+	// Config
+	MsgConfigLoaded: "Konfigurasjon lastet",
+	ErrConfigLoad:   "Kunne ikke laste konfigurasjon",
+
+	// Bootstrap
+	MsgBootstrapConnecting:  "Kobler til bakgrunnstjenester",
+	MsgBootstrapSelfTests:   "Kjører oppstartstester",
+	MsgBootstrapTestsPassed: "Alle oppstartstester bestått",
+	MsgBootstrapHealthStart: "Periodiske helsesjekker startet",
+	ErrBootstrapConnect:     "Kunne ikke koble til nødvendige tjenester",
+	ErrBootstrapSelfTests:   "Oppstartstester mislyktes",
+
+	// Manager
+	MsgManagerConnecting:     "Kobler til tjeneste",
+	MsgManagerConnected:      "Koblet til tjeneste",
+	MsgManagerSelfTest:       "Kjører selvtest",
+	MsgManagerSelfTestPassed: "Selvtest bestått",
+	MsgManagerClosing:        "Stenger tjenester",
+	WarnManagerHealthFailed:  "Helsesjekk mislyktes",
+	ErrManagerConnect:        "Kunne ikke koble til tjeneste",
+	ErrManagerSelfTest:       "Selvtest mislyktes for tjeneste",
+	ErrManagerClose:          "Feil ved lukking av tjeneste",
+	ErrManagerShutdown:       "Feil oppstod under avslutning",
+
+	// Cache
+	MsgCacheSelfTestInit:   "Setter init-nøkkel med nåværende tidsstempel",
+	MsgCacheSelfTestPassed: "Cache-selvtest bestått",
+	ErrCachePing:           "Cache er ikke tilgjengelig",
+	ErrCacheSetInit:        "Kunne ikke skrive init-nøkkel til cache",
+	ErrCacheGetInit:        "Kunne ikke lese init-nøkkel fra cache",
+	ErrCacheInitMismatch:   "Cache init-verdi stemmer ikke overens",
+
+	// Database
+	MsgDbCreatingTestDb:  "Oppretter midlertidig testdatabase",
+	MsgDbRunningCrud:     "Kjører CRUD-verifisering",
+	MsgDbSelfTestPassed:  "Database-selvtest bestått",
+	WarnDbDropTestFailed: "Kunne ikke slette testdatabase (prøver igjen ved neste oppstart)",
+	ErrDbConnect:         "Database er ikke tilgjengelig",
+	ErrDbPing:            "Database svarte ikke på ping",
+	ErrDbCreateTestDb:    "Kunne ikke opprette testdatabase",
+	ErrDbConnectTestDb:   "Kunne ikke koble til testdatabase",
+	ErrDbCrud:            "CRUD-verifisering av database mislyktes",
+	ErrDbCreateTable:     "Kunne ikke opprette testtabell",
+	ErrDbInsert:          "Kunne ikke sette inn testpost",
+	ErrDbRead:            "Kunne ikke lese testpost",
+	ErrDbReadMismatch:    "Testpostens verdi samsvarer ikke med forventet",
+	ErrDbUpdate:          "Kunne ikke oppdatere testpost",
+	ErrDbReadAfterUpdate: "Kunne ikke lese testpost etter oppdatering",
+	ErrDbUpdateMismatch:  "Oppdatert testpostverdi samsvarer ikke med forventet",
+
+	// Server
+	MsgServerStarting: "HTTP-server starter",
+	MsgServerShutdown: "Stenger HTTP-server",
+	MsgServerStopped:  "HTTP-server stoppet på en ryddig måte",
+	MsgServerRoutes:   "Ruter registrert",
+	ErrServerListen:   "HTTP-server støtte på en feil",
+	ErrServerShutdown: "HTTP-server ble tvunget til å stoppe",
+
+	// Health
+	MsgHealthReady:    "Alle tjenester er friske",
+	MsgHealthNotReady: "En eller flere tjenester er ikke klare",
+
+	// GitHub
+	MsgGhConnecting:      "Kobler til GitHub API",
+	MsgGhConnected:       "Koblet til GitHub API",
+	MsgGhAuthToken:       "Autentiserer med personlig tilgangstoken",
+	MsgGhAuthApp:         "Autentiserer som GitHub-app",
+	MsgGhSelfTestPassed:  "GitHub-selvtest bestått",
+	MsgGhRateRemaining:   "Status for GitHub API-hastighetsgrense",
+	WarnGhRateLow:        "GitHub API-hastighetsgrensen er i ferd med å gå tom",
+	ErrGhNotConfigured:   "GitHub er ikke konfigurert — angi et token eller app-legitimasjon",
+	ErrGhAuth:            "GitHub-autentisering mislyktes",
+	ErrGhReadKey:         "Kunne ikke lese privat nøkkelfil for GitHub-app",
+	ErrGhParseKey:        "Kunne ikke tolke privat nøkkel for GitHub-app",
+	ErrGhInstallToken:    "Kunne ikke hente installasjonstoken for GitHub-app",
+	ErrGhSelfTest:        "GitHub-selvtest mislyktes",
+	ErrGhRateLimit:       "GitHub API-hastighetsgrense for lav",
+	ErrGhFetchUser:       "Kunne ikke hente GitHub-bruker",
+	ErrGhFetchOrg:        "Kunne ikke hente GitHub-organisasjon",
+	ErrGhFetchRepo:       "Kunne ikke hente GitHub-repositorium",
+	ErrGhFetchBranches:   "Kunne ikke hente grener for repositorium",
+	ErrGhFetchWorkflows:  "Kunne ikke hente arbeidsflyter for repositorium",
+	ErrGhFetchRuns:       "Kunne ikke hente arbeidsflytkjøringer",
+	ErrGhFetchRateLimit:  "Kunne ikke hente GitHub-hastighetsgrense",
+	ErrGhInvalidWorkflow: "Ugyldig arbeidsflyt-ID",
+
+	// GitHub collector
+	MsgGhCollectorStarting:         "GitHub-repositoriumsamler starter",
+	MsgGhCollectorTick:             "Kjører GitHub-innsamlingssyklus",
+	MsgGhCollectorRepo:             "Samler inn data for repositorium",
+	MsgGhCollectorStopped:          "GitHub-repositoriumsamler stoppet",
+	MsgGhCollectorPassed:           "GitHub-samler selvtest bestått",
+	MsgGhCollectorAnnotations:      "Annotasjoner samlet for mislykket jobb",
+	MsgGhCollectorLockAcquired:     "Innsamlingslås anskaffet for repositorium",
+	MsgGhCollectorLockSkipped:      "Repositorium hoppet over (en annen instans holder låsen)",
+	WarnGhCollectorLockError:       "Kunne ikke anskaffe distribuert lås (fortsetter likevel)",
+	ErrGhCollectorFetchRepo:        "Kunne ikke hente repositoriummetadata",
+	ErrGhCollectorFetchRuns:        "Kunne ikke hente arbeidsflytkjøringer",
+	ErrGhCollectorFetchJobs:        "Kunne ikke hente arbeidsflytjobber",
+	ErrGhCollectorFetchAnnotations: "Kunne ikke hente sjekkjør-annotasjoner",
+	ErrGhCollectorNoRepos:          "Ingen repositorier konfigurert for overvåking",
+	ErrGhCollectorParseRepo:        "Ugyldig repositoriumformat (forventet: eier/repo)",
+
+	// GitHub OAuth auth
+	MsgAuthDevicePrompt:   "Skriv inn koden på URL-en for å autentisere",
+	MsgAuthPolling:        "Venter på GitHub-autorisasjon…",
+	MsgAuthSuccess:        "Vellykket autentisert med GitHub",
+	MsgAuthLoggedOut:      "GitHub-legitimasjon fjernet",
+	MsgAuthStatusLoggedIn: "Logget inn på GitHub",
+	MsgAuthStatusNoToken:  "Ikke logget inn — kjør 'scuffinger github auth' for å autentisere",
+	MsgAuthTokenFromVault: "Bruker GitHub-token fra systemhvelvet",
+	ErrAuthNoClientID:     "github.client_id må være satt i konfigurasjon for OAuth-pålogging",
+	ErrAuthDeviceCode:     "Kunne ikke starte GitHub-enhetsflyt",
+	ErrAuthPoll:           "Kunne ikke fullføre GitHub-autorisasjon",
+	ErrAuthSaveToken:      "Kunne ikke lagre token i systemhvelvet",
+	ErrAuthVerifyToken:    "Lagret token er ikke lenger gyldig",
+
+	// CLI commands
+	CmdRootShort:         "Scuffinger — en lettvekts GitHub-overvåkingstjeneste",
+	CmdRootLong:          "Scuffinger er en lettvekts tjeneste for overvåking av GitHub-repositorier, arbeidsflyter og metrikker. Bygget med Cobra, Viper og Gin.",
+	CmdVersionShort:      "Vis versjonsnummer",
+	CmdVersionLong:       "Viser gjeldende versjon av scuffinger-applikasjonen, inkludert byggeinformasjon når tilgjengelig.",
+	CmdServeShort:        "Start HTTP-serveren",
+	CmdServeLong:         "Starter Gin HTTP-serveren med helsesjekker, Prometheus-metrikker og GitHub API-endepunkter. Serveren kobler til alle konfigurerte bakgrunnstjenester ved oppstart.",
+	CmdGitHubShort:       "GitHub-autentisering og status",
+	CmdGitHubLong:        "Administrer GitHub OAuth-autentisering. Bruk underkommandoer for å logge inn via enhetsflyt, sjekke autentiseringsstatus eller fjerne lagret legitimasjon.",
+	CmdGitHubAuthShort:   "Autentiser med GitHub via OAuth",
+	CmdGitHubAuthLong:    "Starter GitHub OAuth-enhetsflyten. Du får en engangskode å skrive inn på github.com/login/device. Etter autorisasjon lagres tokenet sikkert i systemhvelvet.",
+	CmdGitHubStatusShort: "Vis gjeldende autentiseringsstatus",
+	CmdGitHubStatusLong:  "Viser gjeldende GitHub-autentiseringsstatus, inkludert om legitimasjon er lagret i konfigurasjonsfil, miljøvariabler eller systemhvelv.",
+	CmdGitHubLogoutShort: "Fjern lagret GitHub-legitimasjon",
+	CmdGitHubLogoutLong:  "Fjerner alle GitHub OAuth-tokener som er lagret i systemhvelvet. Påvirker ikke tokener konfigurert via konfigurasjonsfil eller miljøvariabler.",
+	CmdGitHubMonitorShort: "Start GitHub-repositorieinnsamleren",
+	CmdGitHubMonitorLong:  "Starter bakgrunns GitHub-innsamleren som periodisk henter repositorie-metadata, arbeidsflytutførelser og jobbsteg-tidtaking. Eksponerer helse- og Prometheus-metrikkendepunkter, men ingen API-proxy-ruter. Designet for å kjøre som en separat prosess ved siden av API-serveren.",
+	CmdFlagConfig:        "Sti til konfigurasjonsfil",
+}
