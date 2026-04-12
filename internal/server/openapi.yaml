@@ -1,0 +1,798 @@
+openapi: 3.0.3
+info:
+  title: Scuffinger API
+  description: |
+    Scuffinger monitors GitHub Actions workflow runs, caches results in ValKey,
+    and stores historical data in PostgreSQL. This API exposes health checks,
+    GitHub proxy endpoints, an OAuth device-flow helper, debug tooling, and
+    Prometheus metrics.
+  version: 0.1.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: /
+    description: Current instance
+
+tags:
+  - name: Health
+    description: Liveness and readiness probes
+  - name: Metrics
+    description: Prometheus metrics endpoint
+  - name: GitHub
+    description: GitHub API proxy endpoints
+  - name: Auth
+    description: GitHub OAuth device flow
+  - name: "Debug: PostgreSQL"
+    description: Browse the PostgreSQL database (development only)
+  - name: "Debug: Cache"
+    description: Browse the ValKey / Redis cache (development only)
+
+paths:
+  # ── Health ────────────────────────────────────────────────────────────────
+
+  /health/live:
+    get:
+      tags: [Health]
+      summary: Liveness probe
+      description: Returns 200 OK if the process is alive.
+      operationId: healthLive
+      responses:
+        "200":
+          description: Process is alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /health/ready:
+    get:
+      tags: [Health]
+      summary: Readiness probe
+      description: Returns 200 when all backend services are healthy, 503 otherwise.
+      operationId: healthReady
+      responses:
+        "200":
+          description: All services healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadyResponse"
+        "503":
+          description: One or more services unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadyResponse"
+
+  # ── Metrics ───────────────────────────────────────────────────────────────
+
+  /metrics:
+    get:
+      tags: [Metrics]
+      summary: Prometheus metrics
+      description: Exposes application metrics in Prometheus exposition format.
+      operationId: metrics
+      responses:
+        "200":
+          description: Prometheus text exposition
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  # ── GitHub ────────────────────────────────────────────────────────────────
+
+  /api/github/users/{username}:
+    get:
+      tags: [GitHub]
+      summary: Get a GitHub user
+      operationId: getGitHubUser
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: GitHub user object
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: GitHub API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/github/orgs/{org}:
+    get:
+      tags: [GitHub]
+      summary: Get a GitHub organization
+      operationId: getGitHubOrg
+      parameters:
+        - name: org
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: GitHub organization object
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Organization not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: GitHub API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/github/repos/{owner}/{repo}:
+    get:
+      tags: [GitHub]
+      summary: Get a GitHub repository
+      operationId: getGitHubRepo
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: GitHub repository object
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Repository not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: GitHub API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/github/repos/{owner}/{repo}/branches:
+    get:
+      tags: [GitHub]
+      summary: List repository branches
+      description: Returns all branches of a repository (auto-paginated).
+      operationId: listBranches
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Branch list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_count:
+                    type: integer
+                  branches:
+                    type: array
+                    items:
+                      type: object
+        "502":
+          description: GitHub API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/github/repos/{owner}/{repo}/workflows:
+    get:
+      tags: [GitHub]
+      summary: List repository workflows
+      description: Returns all GitHub Actions workflows for a repository (auto-paginated).
+      operationId: listWorkflows
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Workflow list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_count:
+                    type: integer
+                  workflows:
+                    type: array
+                    items:
+                      type: object
+        "502":
+          description: GitHub API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/github/repos/{owner}/{repo}/workflows/{workflow_id}/runs:
+    get:
+      tags: [GitHub]
+      summary: List workflow runs
+      description: Returns runs for a specific workflow (auto-paginated).
+      operationId: listWorkflowRuns
+      parameters:
+        - name: owner
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workflow_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Workflow run list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_count:
+                    type: integer
+                  workflow_runs:
+                    type: array
+                    items:
+                      type: object
+        "400":
+          description: Invalid workflow ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: GitHub API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/github/rate-limit:
+    get:
+      tags: [GitHub]
+      summary: Get GitHub API rate limit
+      description: Returns the current rate limit status for the configured GitHub token.
+      operationId: getRateLimit
+      responses:
+        "200":
+          description: Rate limit information
+          content:
+            application/json:
+              schema:
+                type: object
+        "502":
+          description: GitHub API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Auth ──────────────────────────────────────────────────────────────────
+
+  /api/auth:
+    post:
+      tags: [Auth]
+      summary: Start GitHub OAuth device flow
+      description: |
+        Initiates the GitHub OAuth device flow and returns a verification URI
+        and user code. Requires a GitHub App `client_id` to be configured.
+      operationId: startDeviceFlow
+      responses:
+        "200":
+          description: Device flow started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceFlowResponse"
+        "422":
+          description: No client_id configured
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: GitHub API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Debug: PostgreSQL ─────────────────────────────────────────────────────
+
+  /api/debug/pg/databases:
+    get:
+      tags: ["Debug: PostgreSQL"]
+      summary: List databases
+      description: Returns all non-template PostgreSQL database names.
+      operationId: listDatabases
+      responses:
+        "200":
+          description: Database list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  databases:
+                    type: array
+                    items:
+                      type: string
+        "500":
+          description: Database error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/debug/pg/tables:
+    get:
+      tags: ["Debug: PostgreSQL"]
+      summary: List tables
+      description: Returns all tables in the given schema.
+      operationId: listTables
+      parameters:
+        - name: schema
+          in: query
+          required: false
+          schema:
+            type: string
+            default: public
+      responses:
+        "200":
+          description: Table list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schema:
+                    type: string
+                  tables:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        type:
+                          type: string
+        "500":
+          description: Database error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/debug/pg/tables/{table}/columns:
+    get:
+      tags: ["Debug: PostgreSQL"]
+      summary: Describe table columns
+      description: Returns column metadata for a table.
+      operationId: describeTable
+      parameters:
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: schema
+          in: query
+          required: false
+          schema:
+            type: string
+            default: public
+      responses:
+        "200":
+          description: Column metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schema:
+                    type: string
+                  table:
+                    type: string
+                  columns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        nullable:
+                          type: string
+                        default:
+                          type: string
+                          nullable: true
+        "404":
+          description: Table not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Database error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/debug/pg/tables/{table}/rows:
+    get:
+      tags: ["Debug: PostgreSQL"]
+      summary: Query table rows
+      description: |
+        Returns rows from a table with optional fuzzy search, date filtering,
+        sorting, and pagination.
+      operationId: queryRows
+      parameters:
+        - name: table
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: schema
+          in: query
+          required: false
+          schema:
+            type: string
+            default: public
+          description: PostgreSQL schema name
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Fuzzy search (ILIKE) across all text/varchar/jsonb columns
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "ISO 8601 start date (e.g. 2024-01-01 or 2024-01-01T00:00:00Z)"
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "ISO 8601 end date (e.g. 2024-12-31 or 2024-12-31T23:59:59Z)"
+        - name: column
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Restrict date filter to this specific timestamp column
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Column to ORDER BY (default is the first column)
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 500
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        "200":
+          description: Row data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schema:
+                    type: string
+                  table:
+                    type: string
+                  total:
+                    type: integer
+                    format: int64
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                  rows:
+                    type: array
+                    items:
+                      type: object
+        "404":
+          description: Table not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Database error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Debug: Cache ──────────────────────────────────────────────────────────
+
+  /api/debug/cache/keys:
+    get:
+      tags: ["Debug: Cache"]
+      summary: Scan cache keys
+      description: |
+        Scans ValKey/Redis keys with an optional glob pattern and fuzzy filter.
+      operationId: scanKeys
+      parameters:
+        - name: pattern
+          in: query
+          required: false
+          schema:
+            type: string
+            default: "*"
+          description: Redis SCAN glob pattern
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Substring filter on key names (case-insensitive)
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [string, list, set, hash, zset]
+          description: Filter by Redis key type
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 500
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+            default: "0"
+          description: SCAN cursor for pagination
+      responses:
+        "200":
+          description: Key list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pattern:
+                    type: string
+                  cursor:
+                    type: string
+                  count:
+                    type: integer
+                  keys:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        type:
+                          type: string
+                        ttl_seconds:
+                          type: integer
+                          format: int64
+        "500":
+          description: Cache error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/debug/cache/keys/{key}:
+    get:
+      tags: ["Debug: Cache"]
+      summary: Get a cache key
+      description: |
+        Returns the value, type, TTL, and memory usage for a single cache key.
+        For complex types (list, set, hash, zset) the full contents are returned
+        (capped at 1 000 elements).
+      operationId: getKey
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Key details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  type:
+                    type: string
+                  ttl_seconds:
+                    type: integer
+                    format: int64
+                  memory_bytes:
+                    type: integer
+                    format: int64
+                  value: {}
+        "400":
+          description: Key is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Key does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Cache error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/debug/cache/stats:
+    get:
+      tags: ["Debug: Cache"]
+      summary: Cache statistics
+      description: Returns ValKey/Redis server statistics (INFO sections and DB size).
+      operationId: cacheStats
+      responses:
+        "200":
+          description: Cache stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  db_size:
+                    type: integer
+                    format: int64
+                  sections:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      additionalProperties:
+                        type: string
+        "500":
+          description: Cache error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+# ── Shared schemas ────────────────────────────────────────────────────────────
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+        details:
+          type: string
+          description: Upstream error details (optional)
+
+    ReadyResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, unavailable]
+        services:
+          type: object
+          additionalProperties:
+            type: boolean
+
+    DeviceFlowResponse:
+      type: object
+      properties:
+        verification_uri:
+          type: string
+          example: https://github.com/login/device
+        user_code:
+          type: string
+          example: ABCD-1234
+        device_code:
+          type: string
+        expires_in:
+          type: integer
+        interval:
+          type: integer
+

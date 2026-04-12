@@ -81,7 +81,7 @@
         "showValue": "auto",
         "mergeValues": true,
         "alignValue": "center",
-        "rowHeight": 0.8,
+        "rowHeight": 1,
         "legend": { "displayMode": "list", "placement": "bottom" },
         "tooltip": { "mode": "multi" }
       },

@@ -50,6 +50,7 @@ services:
       SCUFFINGER_DATABASE_SSLMODE: disable
       SCUFFINGER_CACHE_HOST: valkey
       SCUFFINGER_CACHE_PORT: "6379"
+      SCUFFINGER_GITHUB_TOKENS: "${SCUFFINGER_GITHUB_TOKENS}"
     command: ["serve", "--config", "/app/config/config.yaml"]
     depends_on:
       valkey:
@@ -78,6 +79,7 @@ services:
       SCUFFINGER_DATABASE_SSLMODE: disable
       SCUFFINGER_CACHE_HOST: valkey
       SCUFFINGER_CACHE_PORT: "6379"
+      SCUFFINGER_GITHUB_TOKENS: "${SCUFFINGER_GITHUB_TOKENS}"
     command: ["github", "monitor", "--config", "/app/config/config.yaml"]
     depends_on:
       valkey:

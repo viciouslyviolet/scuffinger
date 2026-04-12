@@ -35,6 +35,9 @@ func NewRouter(cfg *config.Config, hc HealthChecker, registrars ...RouteRegistra
 	// Prometheus metrics
 	RegisterMetrics(r)
 
+	// API documentation (Swagger UI)
+	RegisterDocs(r)
+
 	// Additional route groups (GitHub, etc.)
 	for _, reg := range registrars {
 		reg.RegisterRoutes(r)

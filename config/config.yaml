@@ -37,5 +37,5 @@ github:
   max_recent_runs: 50              # Number of recent workflow runs to track per workflow
   fetch_annotations: true          # Fetch check-run annotations from failed workflow runs
   repositories:                    # Repositories to monitor (owner/repo format)
-    - "*"
+    - "viciouslyviolet/scuffinger"
 
