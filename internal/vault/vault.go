@@ -12,7 +12,7 @@ import "errors"
 // ErrNotFound is returned when a secret does not exist.
 var ErrNotFound = errors.New("secret not found")
 
-const serviceName = "scuffinger"
+const serviceName = "scuffinger" //nolint:unused // used in platform-specific files (vault_darwin.go, vault_windows.go)
 
 // Store is the interface every platform backend implements.
 type Store interface {

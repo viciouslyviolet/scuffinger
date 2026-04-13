@@ -266,12 +266,12 @@ func (h *DebugHandler) QueryRows(c *gin.Context) {
 			if t, err := time.Parse(time.RFC3339, toStr); err == nil {
 				conditions = append(conditions, fmt.Sprintf("%s <= $%d", pgQuoteIdent(tsTarget), argN))
 				args = append(args, t)
-				argN++
+				_ = argN // last parameter; no further increment needed
 			} else if t, err := time.Parse("2006-01-02", toStr); err == nil {
 				// End-of-day inclusive
 				conditions = append(conditions, fmt.Sprintf("%s <= $%d", pgQuoteIdent(tsTarget), argN))
 				args = append(args, t.Add(24*time.Hour-time.Nanosecond))
-				argN++
+				_ = argN // last parameter; no further increment needed
 			}
 		}
 	}

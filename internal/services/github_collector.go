@@ -183,7 +183,7 @@ func (s *GitHubCollectorService) tryLock(ctx context.Context, repo string) bool 
 	lockKey := "scuffinger:collect:" + repo
 	ttl := s.cfg.CollectorDuration()
 
-	ok, err := s.rdb.SetNX(ctx, lockKey, s.podID, ttl).Result()
+	ok, err := s.rdb.SetNX(ctx, lockKey, s.podID, ttl).Result() //nolint:staticcheck // SetNX is clearer for distributed lock semantics
 	if err != nil {
 		// ValKey unreachable — degrade gracefully to non-locked mode
 		s.log.Warn(i18n.Get(i18n.WarnGhCollectorLockError), "repo", repo, "error", err)
