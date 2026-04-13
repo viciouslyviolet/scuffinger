@@ -88,12 +88,19 @@
       "targets": [
         {
           "datasource": { "type": "postgres", "uid": "postgres" },
-          "rawSql": "SELECT\n  t.time_point AS \"time\",\n  COALESCE(data->>'workflow_name', 'workflow') || ' / ' || (data->>'name') || '  (#' || j.run_id::text || ')' AS metric,\n  CASE COALESCE(NULLIF(data->>'conclusion', ''), data->>'status', 'unknown')\n    WHEN 'success'     THEN 0\n    WHEN 'failure'     THEN 1\n    WHEN 'in_progress' THEN 2\n    WHEN 'queued'      THEN 3\n    WHEN 'skipped'     THEN 4\n    WHEN 'cancelled'   THEN 5\n    ELSE -1\n  END AS value\nFROM github_workflow_jobs j,\nLATERAL (\n  VALUES\n    ((data->>'started_at')::timestamptz),\n    ((data->>'completed_at')::timestamptz)\n) AS t(time_point)\nWHERE t.time_point IS NOT NULL\n  AND t.time_point BETWEEN $__timeFrom() AND $__timeTo()\n  AND ('${repo:raw}' = '.*' OR j.repo IN (${repo:sqlstring}))\n  AND ('${workflow:raw}' = '.*' OR data->>'workflow_name' IN (${workflow:sqlstring}))\n  AND ('${run_id:raw}' = '.*' OR j.run_id::text IN (${run_id:sqlstring}))\nORDER BY t.time_point",
-          "format": "time_series",
+          "rawSql": "SELECT\n  t.time_point AS \"time\",\n  COALESCE(data->>'workflow_name', 'workflow') || ' / ' || (data->>'name')\n    || '  (#' || j.run_id::text || ')'\n    || '  [' || CASE\n      WHEN (data->>'created_at')::timestamptz < (data->>'started_at')::timestamptz THEN\n        'queue: '\n        || EXTRACT(EPOCH FROM (data->>'started_at')::timestamptz - (data->>'created_at')::timestamptz)::int / 60\n        || 'm ' ||\n        EXTRACT(EPOCH FROM (data->>'started_at')::timestamptz - (data->>'created_at')::timestamptz)::int % 60\n        || 's | '\n      ELSE ''\n    END\n    || CASE\n      WHEN (data->>'completed_at') IS NOT NULL THEN\n        'run: '\n        || EXTRACT(EPOCH FROM (data->>'completed_at')::timestamptz - (data->>'started_at')::timestamptz)::int / 60\n        || 'm ' ||\n        EXTRACT(EPOCH FROM (data->>'completed_at')::timestamptz - (data->>'started_at')::timestamptz)::int % 60\n        || 's'\n      ELSE 'running'\n    END || ']' AS metric,\n  t.value\nFROM github_workflow_jobs j,\nLATERAL (\n  VALUES\n    (\n      CASE WHEN (data->>'created_at')::timestamptz < (data->>'started_at')::timestamptz\n           THEN (data->>'created_at')::timestamptz\n           ELSE NULL\n      END,\n      3\n    ),\n    (\n      (data->>'started_at')::timestamptz,\n      CASE COALESCE(NULLIF(data->>'conclusion', ''), data->>'status', 'unknown')\n        WHEN 'success'     THEN 0\n        WHEN 'failure'     THEN 1\n        WHEN 'in_progress' THEN 2\n        WHEN 'queued'      THEN 3\n        WHEN 'skipped'     THEN 4\n        WHEN 'cancelled'   THEN 5\n        ELSE -1\n      END\n    ),\n    (\n      COALESCE((data->>'completed_at')::timestamptz, now()),\n      NULL::int\n    )\n) AS t(time_point, value)\nWHERE t.time_point IS NOT NULL\n  AND t.time_point BETWEEN $__timeFrom() AND $__timeTo()\n  AND ('${repo:raw}' = '.*' OR j.repo IN (${repo:sqlstring}))\n  AND ('${workflow:raw}' = '.*' OR data->>'workflow_name' IN (${workflow:sqlstring}))\n  AND ('${run_id:raw}' = '.*' OR j.run_id::text IN (${run_id:sqlstring}))\nORDER BY t.time_point",
+          "format": "table",
           "refId": "A"
         }
       ],
-      "transformations": []
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": ["metric"]
+          }
+        }
+      ]
     },
     {
       "id": 2,
